@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} — Souq Three{% endblock %}
+
+{% block extra_css %}
+<style>
+  .cat-head{padding:44px 0 26px;border-bottom:1px solid var(--line);margin-bottom:28px}
+  .cat-head h1{font-family:var(--display);font-size:clamp(2rem,4.4vw,3rem);
+               font-weight:800;letter-spacing:-.03em;margin:0 0 6px}
+  .cat-head p{margin:0;color:var(--muted)}
+  .pager{display:flex;gap:8px;justify-content:center;margin:40px 0;flex-wrap:wrap}
+  .pager a,.pager span{padding:9px 14px;border:1px solid var(--line);font-size:.92rem}
+  .pager .on{background:var(--pine);color:var(--paper);border-color:var(--pine)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+
+  <div class="cat-head">
+    <h1>{{ category.name }}</h1>
+    <p>{{ total_count }} product{{ total_count|pluralize }} in this category.</p>
+  </div>
+
+  {% if products %}
+    <div class="grid">
+      {% for product in products %}
+        <article class="card">
+          <a class="card-img" href="{% url 'catalog:product_detail' product.slug %}">
+            {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% endif %}
+          </a>
+          <h3 class="card-name">
+            <a href="{% url 'catalog:product_detail' product.slug %}">{{ product.name }}</a>
+          </h3>
+          <div class="card-foot">
+            <span class="price">{{ product.price }} EGP</span>
+            {% if product.in_stock %}
+              <span class="stock-in">In stock</span>
+            {% else %}
+              <span class="stock-out">Sold out</span>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+      <nav class="pager">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span class="on">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+
+  {% else %}
+    <div class="empty">
+      <h3>No products here yet</h3>
+      <p>This category is empty for now. Have a look at the full catalogue instead.</p>
+      <a class="btn" href="{% url 'catalog:product_list' %}">Browse all products</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

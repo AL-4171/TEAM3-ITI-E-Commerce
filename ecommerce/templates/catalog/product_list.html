@@ -1,0 +1,103 @@
+{# FILE: templates/catalog/product_list.html #}
+{% extends "base.html" %}
+
+{% block title %}Collection — Atelier Souq{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-head{padding:56px 0 40px}
+  .page-head h1{font-family:var(--display);font-size:clamp(2.2rem,4.6vw,3.4rem);
+                font-weight:700;letter-spacing:-.03em;margin:0 0 8px}
+  .page-head p{margin:0;color:var(--muted)}
+
+  .result-line{font-size:.9rem;color:var(--muted);margin-bottom:28px}
+
+  .pager{display:flex;gap:10px;justify-content:center;align-items:center;
+         margin:56px 0;flex-wrap:wrap}
+  .pager a,.pager span{padding:10px 18px;border:1px solid var(--line);
+                       border-radius:999px;font-size:.9rem;font-weight:600;
+                       transition:all .2s ease}
+  .pager .on{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .pager a:hover{border-color:var(--primary);color:var(--primary)}
+
+  .grid .reveal:nth-child(8n+1){transition-delay:.02s}
+  .grid .reveal:nth-child(8n+2){transition-delay:.06s}
+  .grid .reveal:nth-child(8n+3){transition-delay:.1s}
+  .grid .reveal:nth-child(8n+4){transition-delay:.14s}
+  .grid .reveal:nth-child(8n+5){transition-delay:.18s}
+  .grid .reveal:nth-child(8n+6){transition-delay:.22s}
+  .grid .reveal:nth-child(8n+7){transition-delay:.26s}
+  .grid .reveal:nth-child(8n+8){transition-delay:.3s}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+
+  <div class="page-head">
+    <h1>The full collection</h1>
+    <p>Every active piece, in one place.</p>
+    {# Filter teammate: add your search/category/price/sort form here #}
+    {# once it's ready — this page intentionally has no filtering yet. #}
+  </div>
+
+  {% if products %}
+    <p class="result-line">{{ total_count }} product{{ total_count|pluralize }}.</p>
+
+    <div class="grid">
+      {% for product in products %}
+        <article class="card reveal">
+          <a class="card-img" href="{% url 'catalog:product_detail' product.slug %}">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% endif %}
+            {% if product.in_stock %}
+              <span class="card-badge">In stock</span>
+            {% else %}
+              <span class="card-badge out">Sold out</span>
+            {% endif %}
+          </a>
+          <div class="card-body">
+            <div class="card-cat">{{ product.category.name }}</div>
+            <h3 class="card-name">
+              <a href="{% url 'catalog:product_detail' product.slug %}">{{ product.name }}</a>
+            </h3>
+            <p class="card-desc">{{ product.description|truncatewords:14 }}</p>
+            <div class="card-foot">
+              <span class="price">{{ product.price }} EGP</span>
+              {% if product.in_stock %}
+                <span class="stock-in">{{ product.stock }} left</span>
+              {% else %}
+                <span class="stock-out">Unavailable</span>
+              {% endif %}
+            </div>
+            <div class="card-actions">
+              <a class="btn btn-ghost" href="{% url 'catalog:product_detail' product.slug %}"><span>Details</span></a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+      <nav class="pager">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span class="on">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+
+  {% else %}
+    <div class="empty">
+      <h3>The collection is empty</h3>
+      <p>Add your first products from the admin panel.</p>
+      <a class="btn" href="/admin/catalog/product/add/"><span>Add a product</span></a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}
