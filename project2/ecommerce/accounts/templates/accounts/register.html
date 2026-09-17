@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Account | Atelier Souq</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #fafafe,
+                    #eeeaff
+                );
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding: 30px;
+
+        }
+
+
+        .card {
+
+            width: 650px;
+
+            max-width: 100%;
+
+            background: white;
+
+            padding: 45px;
+
+            border-radius: 25px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(22,17,41,0.15);
+
+            animation: appear 0.7s ease;
+
+        }
+
+
+        h1 {
+
+            font-family: Georgia, serif;
+
+            color: #161129;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .subtitle {
+
+            color: #777;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .row {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 18px;
+
+        }
+
+
+        .group {
+
+            margin-bottom: 18px;
+
+        }
+
+
+        label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-weight: bold;
+
+        }
+
+
+        input {
+
+            width: 100%;
+
+            padding: 13px;
+
+            border: 1px solid #ddd;
+
+            border-radius: 10px;
+
+            outline: none;
+
+            transition: 0.3s;
+
+        }
+
+
+        input:focus {
+
+            border-color: #5B3DF5;
+
+            box-shadow:
+                0 0 0 4px
+                rgba(91,61,245,0.1);
+
+            transform: translateY(-2px);
+
+        }
+
+
+        button {
+
+            width: 100%;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #5B3DF5;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+
+        }
+
+
+        button:hover {
+
+            background: #3B24B8;
+
+            transform: translateY(-3px);
+
+        }
+
+
+        .error {
+
+            color: #b42318;
+
+            background: #fff1f1;
+
+            padding: 8px;
+
+            border-radius: 7px;
+
+            margin-top: 5px;
+
+            font-size: 13px;
+
+        }
+
+
+        .footer {
+
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #777;
+
+        }
+
+
+        .footer a {
+
+            color: #5B3DF5;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+        }
+
+
+        @keyframes appear {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(30px);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0);
+
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .row {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            .card {
+
+                padding: 30px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+    <h1>
+        Create Account
+    </h1>
+
+    <p class="subtitle">
+        Join Atelier Souq and start shopping.
+    </p>
+
+
+    {% if form.non_field_errors %}
+
+        <div class="error">
+            {{ form.non_field_errors }}
+        </div>
+
+    {% endif %}
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <div class="row">
+
+            <div class="group">
+
+                <label>
+                    First Name
+                </label>
+
+                {{ form.first_name }}
+
+                {% if form.first_name.errors %}
+                    <div class="error">
+                        {{ form.first_name.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <div class="group">
+
+                <label>
+                    Last Name
+                </label>
+
+                {{ form.last_name }}
+
+                {% if form.last_name.errors %}
+                    <div class="error">
+                        {{ form.last_name.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="group">
+
+            <label>
+                Email
+            </label>
+
+            {{ form.email }}
+
+            {% if form.email.errors %}
+                <div class="error">
+                    {{ form.email.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="group">
+
+            <label>
+                Mobile
+            </label>
+
+            {{ form.mobile }}
+
+            {% if form.mobile.errors %}
+                <div class="error">
+                    {{ form.mobile.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="row">
+
+            <div class="group">
+
+                <label>
+                    Password
+                </label>
+
+                {{ form.password }}
+
+                {% if form.password.errors %}
+                    <div class="error">
+                        {{ form.password.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <div class="group">
+
+                <label>
+                    Confirm Password
+                </label>
+
+                {{ form.confirm_password }}
+
+                {% if form.confirm_password.errors %}
+                    <div class="error">
+                        {{ form.confirm_password.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <button type="submit">
+            Create Account
+        </button>
+
+    </form>
+
+
+    <div class="footer">
+
+        Already have an account?
+
+        <a href="{% url 'accounts:login' %}">
+            Sign In
+        </a>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
