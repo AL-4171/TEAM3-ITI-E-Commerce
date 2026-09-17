@@ -80,26 +80,26 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-#DATABASES = {
- #   'default': {
-  #      'ENGINE': 'django.db.backends.sqlite3',
-   #     'NAME': BASE_DIR / 'db.sqlite3',
-    #}
-#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 # --- Custom user model ---
 AUTH_USER_MODEL = 'accounts.User'
  
 # --- Database (PostgreSQL) ---
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-    }
-}
+#DATABASES = {
+    #'default': {
+     #   'ENGINE': 'django.db.backends.postgresql',
+     #   'NAME': config('DB_NAME'),
+     #   'USER': config('DB_USER'),
+     #   'PASSWORD': config('DB_PASSWORD'),
+      #  'HOST': config('DB_HOST', default='localhost'),
+      #  'PORT': config('DB_PORT', default='5432'),
+#    }
+#}
  
 # --- Media files (product images) ---
 MEDIA_URL = '/media/'
