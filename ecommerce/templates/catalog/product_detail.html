@@ -1,3 +1,4 @@
+{# FILE: templates/catalog/product_detail.html #}
 {% extends "base.html" %}
 
 {% block title %}{{ product.name }} — Atelier Souq{% endblock %}
@@ -115,7 +116,7 @@
         <p>{{ product.description }}</p>
       </div>
 
-     
+      {# --- Every product field from the project spec, shown explicitly --- #}
       <div class="facts">
         <h2>Product details</h2>
         <dl>
@@ -136,6 +137,15 @@
         </dl>
       </div>
 
+      {% comment %}
+        Cart teammate wires this form to their add-to-cart view.
+        Orders teammate: "Buy Now" should skip the cart and go straight
+        to checkout with this one product/quantity pre-filled — wire the
+        href below to your checkout URL once it exists.
+        Authentication teammate: once accounts app is ready, wrap this
+        form (or the submit button) in {% if user.is_authenticated %}
+        if guests should not be able to add to cart / buy directly.
+      {% endcomment %}
       <form class="buy" method="post" action="#">
         {% csrf_token %}
         <div class="qty">
@@ -144,8 +154,10 @@
                  min="1" max="{{ product.stock }}" {% if not product.in_stock %}disabled{% endif %}>
         </div>
         <button class="btn" type="submit" {% if not product.in_stock %}disabled{% endif %}>
-          <span>{% if product.in_stock %}Add to cart{% else %}Unavailable{% endif %}</span>
+          <span>{% if product.in_stock %}Add to Cart{% else %}Unavailable{% endif %}</span>
         </button>
+        {# orders teammate: replace href="#" with the real checkout URL #}
+        <a class="btn btn-accent" href="#"><span>{% if product.in_stock %}Buy Now{% else %}Unavailable{% endif %}</span></a>
         <a class="btn btn-ghost" href="{% url 'catalog:product_list' %}"><span>Keep browsing</span></a>
       </form>
     </div>

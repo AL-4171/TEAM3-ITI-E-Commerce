@@ -72,7 +72,9 @@
               {% endif %}
             </div>
             <div class="card-actions">
-              <a class="btn btn-ghost" href="{% url 'catalog:product_detail' product.slug %}"><span>Details</span></a>
+              {# cart teammate: turn this into a real POST form to your add-to-cart endpoint #}
+              <a class="btn btn-ghost" href="#"><span>Add to Cart</span></a>
+              <a class="btn" href="{% url 'catalog:product_detail' product.slug %}"><span>Details</span></a>
             </div>
           </div>
         </article>

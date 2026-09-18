@@ -1,3 +1,12 @@
+"""
+FILE: catalog/views.py
+
+Filter/search/sort logic intentionally removed — that's being built by
+another team member. product_list now just paginates all active products
+plainly. When the filter teammate is ready, they extend THIS function
+(and product_list.html) rather than replacing it.
+"""
+
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 
@@ -68,4 +77,12 @@ def category_products(request, slug):
         'page_obj': page_obj,
         'products': page_obj.object_list,
         'total_count': paginator.count,
+    })
+
+
+def category_list(request):
+    """All categories, shown as a browsable list (nav link)."""
+    categories = Category.objects.all()
+    return render(request, 'catalog/category_list.html', {
+        'categories': categories,
     })

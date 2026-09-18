@@ -27,7 +27,7 @@ urlpatterns = [
  
     # uncomment each one as that app's
     # urls.py file is actually created by its owner.
-    # path('accounts/', include('accounts.urls')),
+     path('accounts/', include('accounts.urls')),
     # path('cart/', include('cart.urls')),
     # path('orders/', include('orders.urls')),
 ]

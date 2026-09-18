@@ -1,33 +1,54 @@
-# Create your models here.
-from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
 from django.db import models
- 
- 
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+
+
+class UserManager(BaseUserManager):
+
+    def create_user(self, email, password=None, **extra_fields):
+
+        if not email:
+            raise ValueError("Email is required")
+
+        email = self.normalize_email(email)
+
+        user = self.model(
+            email=email,
+            **extra_fields
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+
+
+    def create_superuser(self, email, password=None, **extra_fields):
+
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
+
+        return self.create_user(
+            email=email,
+            password=password,
+            **extra_fields
+        )
+
+
 class User(AbstractUser):
-    """
-    Custom user model.
-    - Login is done by EMAIL (unique), not username.
-    - Phone must be a valid Egyptian mobile number.
-    - first_name / last_name already exist on AbstractUser.
-    """
- 
-    egyptian_phone_validator = RegexValidator(
-        regex=r'^01[0125][0-9]{8}$',
-        message="Enter a valid Egyptian phone number (e.g. 01012345678)."
-    )
- 
+
+    username = None
+
     email = models.EmailField(unique=True)
-    phone = models.CharField(
-        max_length=11,
-        validators=[egyptian_phone_validator],
-        unique=True,
-    )
- 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'phone']
- 
+
+    mobile = models.CharField(max_length=11)
+
+    USERNAME_FIELD = "email"
+
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
+
+
     def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.email})"
- 
- 
+        return self.email

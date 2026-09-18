@@ -98,8 +98,8 @@
 
   .card-img{aspect-ratio:1/1;overflow:hidden;position:relative;
             background:linear-gradient(135deg,#F1EFFD,#FFF1EC);
-            display:flex;align-items:center;justify-content:center;padding:14px}
-  .card-img img{width:100%;height:100%;object-fit:cover;
+            display:flex;align-items:center;justify-content:center;padding:26px}
+  .card-img img{width:100%;height:100%;object-fit:contain;
                 transition:transform .5s cubic-bezier(.2,.7,.2,1)}
   .card:hover .card-img img{transform:scale(1.06)}
   .card-badge{position:absolute;top:12px;left:12px;font-size:.68rem;font-weight:700;
@@ -123,7 +123,7 @@
   .stock-out{font-size:.76rem;color:#C4372B;font-weight:600}
   .stock-in{font-size:.76rem;color:var(--mint);font-weight:600}
   .card-actions{display:flex;gap:8px;margin-top:14px}
-  .card-actions .btn{flex:1;text-align:center;padding:10px 14px;font-size:.82rem}
+  .card-actions .btn{flex:1;text-align:center;padding:10px 12px;font-size:.78rem}
 
   /* ---------- footer ---------- */
   .foot{border-top:1px solid var(--line);margin-top:110px;padding:48px 0;
@@ -133,6 +133,53 @@
   .empty{padding:90px 20px;text-align:center;border:1px dashed var(--line);border-radius:18px}
   .empty h3{font-family:var(--display);font-size:1.65rem;font-weight:600;margin:0 0 10px}
   .empty p{color:var(--muted);margin:0 0 24px}
+
+  /* ---------- toast messages ---------- */
+  .toast-stack{position:fixed;top:88px;right:24px;z-index:60;
+              display:flex;flex-direction:column;gap:10px;max-width:340px}
+  .toast{display:flex;align-items:center;gap:12px;padding:14px 16px;
+        border-radius:12px;font-size:.86rem;font-weight:600;
+        box-shadow:0 16px 30px -14px rgba(22,17,41,.35);
+        animation:toastIn .35s cubic-bezier(.2,.7,.2,1) both,
+                  toastOut .35s cubic-bezier(.4,0,.2,1) 3.6s both}
+  .toast span{flex:1}
+  .toast-close{background:none;border:none;cursor:pointer;font-size:.85rem;
+              opacity:.6;color:inherit;padding:0;line-height:1}
+  .toast-close:hover{opacity:1}
+  .toast-success{background:#E7F8F1;color:#0E8A5F}
+  .toast-info{background:#EFEBFE;color:#3B24B8}
+  .toast-error,.toast-warning{background:#FFF1EF;color:#C4372B}
+  @keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes toastOut{to{opacity:0;transform:translateX(30px);height:0;padding:0;margin:0;overflow:hidden}}
+  @media (max-width:520px){.toast-stack{left:16px;right:16px;top:80px;max-width:none}}
+
+  /* ---------- admin sidebar ---------- */
+  .admin-toggle{position:fixed;right:24px;bottom:24px;z-index:40;
+               height:52px;padding:0 22px 0 18px;border-radius:999px;
+               background:var(--ink);color:#fff;display:flex;align-items:center;
+               gap:8px;font-family:var(--body);font-size:.88rem;font-weight:700;
+               border:none;cursor:pointer;
+               box-shadow:0 12px 24px -10px rgba(22,17,41,.5);
+               transition:transform .25s ease}
+  .admin-toggle:hover{transform:scale(1.04)}
+  .admin-toggle .icon{font-size:1.15rem}
+  .admin-sidebar{position:fixed;top:0;right:-320px;width:300px;height:100vh;
+                background:var(--surface);border-left:1px solid var(--line);
+                z-index:50;padding:28px 22px;transition:right .3s cubic-bezier(.2,.7,.2,1);
+                overflow-y:auto}
+  .admin-sidebar.open{right:0}
+  .admin-sidebar h3{font-family:var(--display);font-size:1.2rem;font-weight:700;
+                    margin:0 0 4px}
+  .admin-sidebar .sub{font-size:.82rem;color:var(--muted);margin-bottom:22px}
+  .admin-sidebar a{display:block;padding:12px 14px;border-radius:10px;
+                   font-size:.88rem;font-weight:600;color:var(--ink);
+                   margin-bottom:6px;transition:background .2s ease}
+  .admin-sidebar a:hover{background:var(--bg);color:var(--primary)}
+  .admin-close{position:absolute;top:20px;right:20px;background:none;border:none;
+              font-size:1.1rem;cursor:pointer;color:var(--muted)}
+  .admin-overlay{position:fixed;inset:0;background:rgba(22,17,41,.35);z-index:45;
+                display:none}
+  .admin-overlay.open{display:block}
 
   @media (max-width:900px){
     .top-in{flex-wrap:wrap}
@@ -149,18 +196,21 @@
 
 <header class="top" id="siteHeader">
   <div class="wrap top-in">
-    <a class="brand" href="{% url 'catalog:home' %}"><span class="brand-dot"></span>E-commerce</a>
+    <a class="brand" href="{% url 'catalog:home' %}"><span class="brand-dot"></span>Electro Store</a>
 
     <nav class="nav">
       <a href="{% url 'catalog:home' %}">Home</a>
       <a href="{% url 'catalog:product_list' %}">Products</a>
-      {# Categories: shown per-category from the home page tiles for now. #}
-      {# A dedicated /categories/ index page can be added later if needed. #}
+      
+      <a href="#">Categories</a>
       {% if user.is_authenticated %}
-        {# orders teammate: replace href="#" with {% url 'orders:list' %} once ready #}
-        <a href="#">My Orders</a>
-        {# accounts teammate: replace href="#" with {% url 'accounts:profile' %} once ready #}
-        <a href="#">Profile</a>
+        {% if user.is_staff %}
+          <a href="/admin/orders/order/">All Orders</a>
+        {% else %}
+          {# orders teammate: replace href="#" with {% url 'orders:list' %} once ready #}
+          <a href="#">My Orders</a>
+        {% endif %}
+        <a href="{% url 'accounts:profile' %}">Profile</a>
       {% endif %}
     </nav>
 
@@ -168,25 +218,55 @@
       {# cart teammate: replace href="#" with {% url 'cart:view' %} once ready #}
       <a class="btn btn-ghost" href="#"><span>Cart</span></a>
       {% if user.is_authenticated %}
-        {# accounts teammate: replace href="#" with {% url 'accounts:profile' %} once ready #}
-        <a class="btn" href="#"><span>{{ user.first_name|default:"Account" }}</span></a>
+        <a class="btn" href="{% url 'accounts:profile' %}">
+          <span>{% if user.is_staff %}Admin, {{ user.first_name }}{% else %}{{ user.first_name|default:"Account" }}{% endif %}</span>
+        </a>
+        <a class="btn btn-ghost" href="{% url 'accounts:logout' %}"><span>Log out</span></a>
       {% else %}
-        {# accounts teammate: replace href="#" with {% url 'accounts:login' %} once ready #}
-        <a class="btn btn-ghost" href="#"><span>Log in</span></a>
-        {# accounts teammate: replace href="#" with {% url 'accounts:register' %} once ready #}
-        <a class="btn" href="#"><span>Sign up</span></a>
+        <a class="btn btn-ghost" href="{% url 'accounts:login' %}"><span>Log in</span></a>
+        <a class="btn" href="{% url 'accounts:register' %}"><span>Sign up</span></a>
       {% endif %}
     </div>
   </div>
 </header>
 
+{% if user.is_authenticated and user.is_staff %}
+  <div class="admin-overlay" id="adminOverlay"></div>
+  <button class="admin-toggle" id="adminToggle" title="Open Admin Panel">
+    <span class="icon">⚙</span><span>Admin Panel</span>
+  </button>
+  <aside class="admin-sidebar" id="adminSidebar">
+    <button class="admin-close" id="adminClose">✕</button>
+    <h3>Admin Panel</h3>
+    <p class="sub">Manage the store's data directly.</p>
+    <a href="/admin/catalog/category/">Manage Categories</a>
+    <a href="/admin/catalog/category/add/">+ Add Category</a>
+    <a href="/admin/catalog/product/">Manage Products</a>
+    <a href="/admin/catalog/product/add/">+ Add Product</a>
+    {# orders teammate: uncomment once the orders app is ready #}
+    {# <a href="/admin/orders/order/">Manage Orders</a> #}
+    <a href="/admin/accounts/user/">Manage Users</a>
+    <a href="/admin/">Full Django Admin →</a>
+  </aside>
+{% endif %}
+
 <main>
+  {% if messages %}
+    <div class="toast-stack" id="toastStack">
+      {% for message in messages %}
+        <div class="toast toast-{{ message.tags }}">
+          <span>{{ message }}</span>
+          <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
   {% block content %}{% endblock %}
 </main>
 
 <footer class="foot">
   <div class="wrap foot-in">
-    <div> ITI final project, Team 3.</div>
+    <div>Electro Store — ITI final project, Team 3.</div>
     <div>Crafted with Django.</div>
   </div>
 </footer>
@@ -210,6 +290,27 @@
     revealEls.forEach(el => io.observe(el));
   } else {
     revealEls.forEach(el => el.classList.add('in'));
+  }
+
+  // Auto-remove toast messages from the DOM after they fade out
+  document.querySelectorAll('.toast').forEach(toast => {
+    setTimeout(() => toast.remove(), 4000);
+  });
+  const adminToggle = document.getElementById('adminToggle');
+  const adminSidebar = document.getElementById('adminSidebar');
+  const adminOverlay = document.getElementById('adminOverlay');
+  const adminClose = document.getElementById('adminClose');
+  function closeAdminSidebar() {
+    adminSidebar && adminSidebar.classList.remove('open');
+    adminOverlay && adminOverlay.classList.remove('open');
+  }
+  if (adminToggle) {
+    adminToggle.addEventListener('click', () => {
+      adminSidebar.classList.toggle('open');
+      adminOverlay.classList.toggle('open');
+    });
+    adminClose.addEventListener('click', closeAdminSidebar);
+    adminOverlay.addEventListener('click', closeAdminSidebar);
   }
 </script>
 
