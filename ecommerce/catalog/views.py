@@ -62,7 +62,7 @@ def product_detail(request, slug):
 
 
 def category_products(request, slug):
-    """Browse products by category (spec 13)."""
+    """Browse active products in one category."""
     category = get_object_or_404(Category, slug=slug)
     products = Product.objects.filter(
         category=category,
@@ -72,7 +72,7 @@ def category_products(request, slug):
     paginator = Paginator(products, 12)
     page_obj = paginator.get_page(request.GET.get('page'))
 
-    return render(request, 'catalog/category_products.html', {
+    return render(request, 'catalog/category_detail.html', {
         'category': category,
         'page_obj': page_obj,
         'products': page_obj.object_list,

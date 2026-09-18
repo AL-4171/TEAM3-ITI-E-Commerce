@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Categories — Electro Store{% endblock %}
+
+{% block extra_css %}
+<style>
+  .category-head{padding:56px 0 36px}
+  .category-head h1{font-family:var(--display);font-size:clamp(2.2rem,4.6vw,3.4rem);margin:0 0 8px}
+  .category-head p{margin:0;color:var(--muted)}
+  .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
+  .category-card{display:flex;flex-direction:column;min-height:190px;padding:24px;background:var(--surface);border:1px solid var(--line);border-radius:18px;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+  .category-card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 20px 32px -24px rgba(22,17,41,.35)}
+  .category-card h2{font-family:var(--display);font-size:1.35rem;margin:0 0 10px}
+  .category-card p{color:var(--muted);margin:0 0 20px}
+  .category-card .btn{margin-top:auto;align-self:flex-start}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <header class="category-head">
+    <h1>Shop by category</h1>
+    <p>Find the right technology for your setup.</p>
+  </header>
+
+  {% if categories %}
+    <div class="category-grid">
+      {% for category in categories %}
+        <article class="category-card reveal">
+          <h2>{{ category.name }}</h2>
+          {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+          <a class="btn btn-ghost" href="{% url 'catalog:category_detail' category.slug %}"><span>View products</span></a>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <h3>No categories yet</h3>
+      <p>Categories can be added from the admin panel.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

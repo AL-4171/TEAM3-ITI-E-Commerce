@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} — Electro Store{% endblock %}
+
+{% block extra_css %}
+<style>
+  .category-head{padding:50px 0 30px;border-bottom:1px solid var(--line);margin-bottom:30px}
+  .category-head h1{font-family:var(--display);font-size:clamp(2.1rem,4.4vw,3rem);margin:0 0 8px}
+  .category-head p{color:var(--muted);margin:0}
+  .category-actions{margin-top:20px}
+  .stock-line{font-size:.78rem;color:var(--muted);margin:12px 0 0}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <header class="category-head">
+    <h1>{{ category.name }}</h1>
+    {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+    <div class="category-actions">
+      <a class="btn btn-ghost" href="{% url 'catalog:category_list' %}"><span>All categories</span></a>
+    </div>
+  </header>
+
+  {% if products %}
+    <p class="result-line">{{ total_count }} product{{ total_count|pluralize }} in this category.</p>
+    <div class="grid">
+      {% for product in products %}
+        <article class="card reveal">
+          <a class="card-img" href="{% url 'catalog:product_detail' product.slug %}">
+            {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% endif %}
+            {% if product.in_stock %}<span class="card-badge">In stock</span>{% else %}<span class="card-badge out">Sold out</span>{% endif %}
+          </a>
+          <div class="card-body">
+            <h2 class="card-name"><a href="{% url 'catalog:product_detail' product.slug %}">{{ product.name }}</a></h2>
+            <p class="card-desc">{{ product.description|truncatewords:14 }}</p>
+            <div class="card-foot">
+              <span class="price">{{ product.price }} EGP</span>
+              {% if product.in_stock %}<span class="stock-in">{{ product.stock }} left</span>{% else %}<span class="stock-out">Unavailable</span>{% endif %}
+            </div>
+            <div class="card-actions">
+              <a class="btn" href="{% url 'catalog:product_detail' product.slug %}"><span>Details</span></a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+      <nav class="pager" aria-label="Category products pages">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+        <span class="on">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="empty">
+      <h3>No products in this category</h3>
+      <p>There are no active products here yet.</p>
+      <a class="btn" href="{% url 'catalog:product_list' %}"><span>Browse all products</span></a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -202,7 +202,7 @@
       <a href="{% url 'catalog:home' %}">Home</a>
       <a href="{% url 'catalog:product_list' %}">Products</a>
       
-      <a href="#">Categories</a>
+      <a href="{% url 'catalog:category_list' %}">Categories</a>
       {% if user.is_authenticated %}
         {% if user.is_staff %}
           <a href="/admin/orders/order/">All Orders</a>
