@@ -239,8 +239,8 @@
     <button class="admin-close" id="adminClose">✕</button>
     <h3>Admin Panel</h3>
     <p class="sub">Manage the store's data directly.</p>
-    <a href="/admin/catalog/category/">Manage Categories</a>
-    <a href="/admin/catalog/category/add/">+ Add Category</a>
+    <a href="{% url 'catalog:admin_category_list' %}">Manage Categories</a>
+    <a href="{% url 'catalog:admin_category_add' %}">+ Add Category</a>
     <a href="/admin/catalog/product/">Manage Products</a>
     <a href="/admin/catalog/product/add/">+ Add Product</a>
     {# orders teammate: uncomment once the orders app is ready #}

@@ -8,8 +8,13 @@ plainly. When the filter teammate is ready, they extend THIS function
 """
 
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.db.models import Count
+from django.db.models.deletion import ProtectedError
+from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import CategoryForm
 from .models import Category, Product
 
 
@@ -85,4 +90,71 @@ def category_list(request):
     categories = Category.objects.all()
     return render(request, 'catalog/category_list.html', {
         'categories': categories,
+    })
+
+
+@staff_member_required
+def admin_category_list(request):
+    """Manage categories from the storefront for staff users."""
+    categories = Category.objects.annotate(product_count=Count('products'))
+    return render(request, 'catalog/admin/category_manage_list.html', {
+        'categories': categories,
+    })
+
+
+@staff_member_required
+def admin_category_add(request):
+    """Create a category from the storefront."""
+    form = CategoryForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Category created successfully.')
+        return redirect('catalog:admin_category_list')
+
+    return render(request, 'catalog/admin/category_form.html', {
+        'form': form,
+        'page_title': 'Add Category',
+        'submit_label': 'Create Category',
+    })
+
+
+@staff_member_required
+def admin_category_edit(request, pk):
+    """Edit an existing category from the storefront."""
+    category = get_object_or_404(Category, pk=pk)
+    form = CategoryForm(request.POST or None, instance=category)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Category updated successfully.')
+        return redirect('catalog:admin_category_list')
+
+    return render(request, 'catalog/admin/category_form.html', {
+        'form': form,
+        'category': category,
+        'page_title': 'Edit Category',
+        'submit_label': 'Save Changes',
+    })
+
+
+@staff_member_required
+def admin_category_delete(request, pk):
+    """Confirm and delete a category unless products still reference it."""
+    category = get_object_or_404(Category, pk=pk)
+    error_message = None
+
+    if request.method == 'POST':
+        try:
+            category.delete()
+        except ProtectedError:
+            error_message = (
+                'This category cannot be deleted because it has products '
+                'attached to it.'
+            )
+        else:
+            messages.success(request, 'Category deleted successfully.')
+            return redirect('catalog:admin_category_list')
+
+    return render(request, 'catalog/admin/category_confirm_delete.html', {
+        'category': category,
+        'error_message': error_message,
     })
