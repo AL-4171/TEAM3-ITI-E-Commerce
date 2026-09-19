@@ -8,11 +8,13 @@
   .category-head h1{font-family:var(--display);font-size:clamp(2.2rem,4.6vw,3.4rem);margin:0 0 8px}
   .category-head p{margin:0;color:var(--muted)}
   .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
-  .category-card{display:flex;flex-direction:column;min-height:190px;padding:24px;background:var(--surface);border:1px solid var(--line);border-radius:18px;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
-  .category-card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 20px 32px -24px rgba(22,17,41,.35)}
+  .category-card{display:flex;flex-direction:column;min-height:190px;padding:24px;background:linear-gradient(135deg,#f8f0fc 0%,#f1eefc 100%);border:1px solid #e5dcf4;border-radius:16px;box-shadow:0 12px 24px -20px rgba(59,36,184,.35);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+  .category-card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 20px 32px -20px rgba(59,36,184,.35)}
   .category-card h2{font-family:var(--display);font-size:1.35rem;margin:0 0 10px}
-  .category-card p{color:var(--muted);margin:0 0 20px}
-  .category-card .btn{margin-top:auto;align-self:flex-start}
+  .category-card p{color:var(--muted);margin:0 0 10px}
+  .category-card .count{font-size:.84rem;margin-bottom:20px}
+  .category-card .browse{margin-top:auto;align-self:flex-start;color:var(--primary-deep);font-size:.84rem;font-weight:700}
+  .category-card .browse:hover{color:var(--primary)}
 </style>
 {% endblock %}
 
@@ -29,7 +31,8 @@
         <article class="category-card reveal">
           <h2>{{ category.name }}</h2>
           {% if category.description %}<p>{{ category.description }}</p>{% endif %}
-          <a class="btn btn-ghost" href="{% url 'catalog:category_detail' category.slug %}"><span>View products</span></a>
+          <p class="count">{{ category.products.count }} item{{ category.products.count|pluralize }}</p>
+          <a class="browse" href="{% url 'catalog:category_detail' category.slug %}">Browse →</a>
         </article>
       {% endfor %}
     </div>

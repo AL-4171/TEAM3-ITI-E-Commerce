@@ -19,13 +19,11 @@ from .models import Category, Product
 
 
 def home(request):
-    """Landing page: newest active products + all categories."""
+    """Landing page: newest active products."""
     featured = Product.objects.filter(is_active=True).select_related('category')[:8]
-    categories = Category.objects.all()
 
     return render(request, 'catalog/home.html', {
         'featured': featured,
-        'categories': categories,
     })
 
 
