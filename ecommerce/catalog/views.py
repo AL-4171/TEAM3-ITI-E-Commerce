@@ -1,10 +1,8 @@
 """
 FILE: catalog/views.py
 
-Filter/search/sort logic intentionally removed — that's being built by
-another team member. product_list now just paginates all active products
-plainly. When the filter teammate is ready, they extend THIS function
-(and product_list.html) rather than replacing it.
+Integrated full search, category filtering, price range, and ordering 
+logic into product_list & category_products while maintaining pagination.
 """
 
 from django.core.paginator import Paginator
@@ -29,11 +27,44 @@ def home(request):
 
 def product_list(request):
     """
-    All active products, plain listing, no filtering yet.
-    (Search / category filter / price range / ordering to be added
-    by the teammate responsible for that part.)
+    All active products with Search, Category Filter, Price Range, 
+    and Ordering, with pagination support.
     """
     products = Product.objects.filter(is_active=True).select_related('category')
+    categories = Category.objects.all()
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        products = products.filter(name__icontains=search_query)
+
+    category_id = request.GET.get('category', '').strip()
+    if category_id:
+        products = products.filter(category_id=category_id)
+
+    min_price = request.GET.get('min_price', '').strip()
+    max_price = request.GET.get('max_price', '').strip()
+
+    if min_price:
+        try:
+            products = products.filter(price__gte=float(min_price))
+        except ValueError:
+            pass
+
+    if max_price:
+        try:
+            products = products.filter(price__lte=float(max_price))
+        except ValueError:
+            pass
+
+    sort_by = request.GET.get('sort', '').strip()
+    if sort_by == 'price_asc':
+        products = products.order_by('price')
+    elif sort_by == 'price_desc':
+        products = products.order_by('-price')
+    elif sort_by == 'name_asc':
+        products = products.order_by('name')
+    elif sort_by == 'name_desc':
+        products = products.order_by('-name')
 
     paginator = Paginator(products, 12)
     page_obj = paginator.get_page(request.GET.get('page'))
@@ -42,6 +73,12 @@ def product_list(request):
         'page_obj': page_obj,
         'products': page_obj.object_list,
         'total_count': paginator.count,
+        'categories': categories,
+        'search_query': search_query,
+        'selected_category': category_id,
+        'min_price': min_price,
+        'max_price': max_price,
+        'sort_by': sort_by,
     })
 
 
@@ -65,12 +102,41 @@ def product_detail(request, slug):
 
 
 def category_products(request, slug):
-    """Browse active products in one category."""
+    """Browse active products in one category with filter, search, and sort."""
     category = get_object_or_404(Category, slug=slug)
     products = Product.objects.filter(
         category=category,
         is_active=True,
     ).select_related('category')
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        products = products.filter(name__icontains=search_query)
+
+    min_price = request.GET.get('min_price', '').strip()
+    max_price = request.GET.get('max_price', '').strip()
+
+    if min_price:
+        try:
+            products = products.filter(price__gte=float(min_price))
+        except ValueError:
+            pass
+
+    if max_price:
+        try:
+            products = products.filter(price__lte=float(max_price))
+        except ValueError:
+            pass
+
+    sort_by = request.GET.get('sort', '').strip()
+    if sort_by == 'price_asc':
+        products = products.order_by('price')
+    elif sort_by == 'price_desc':
+        products = products.order_by('-price')
+    elif sort_by == 'name_asc':
+        products = products.order_by('name')
+    elif sort_by == 'name_desc':
+        products = products.order_by('-name')
 
     paginator = Paginator(products, 12)
     page_obj = paginator.get_page(request.GET.get('page'))
@@ -80,6 +146,10 @@ def category_products(request, slug):
         'page_obj': page_obj,
         'products': page_obj.object_list,
         'total_count': paginator.count,
+        'search_query': search_query,
+        'min_price': min_price,
+        'max_price': max_price,
+        'sort_by': sort_by,
     })
 
 
