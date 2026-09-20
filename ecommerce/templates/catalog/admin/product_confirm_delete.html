@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ product.name }} | Atelier Souq{% endblock %}
+
+{% block extra_css %}
+<style>
+  .delete-page{padding:90px 0 30px}
+  .delete-box{max-width:600px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:36px}
+  .delete-box h1{font-family:var(--display);font-size:2.2rem;margin:0 0 12px}
+  .delete-box p{color:var(--muted);margin:0 0 24px}
+  .delete-actions{display:flex;gap:12px}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="delete-page">
+  <div class="wrap">
+    <div class="delete-box">
+      <h1>Delete product?</h1>
+      <p>Are you sure you want to delete <strong>{{ product.name }}</strong>? This action cannot be undone.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="delete-actions">
+          <button class="btn btn-delete" type="submit"><span>Delete Product</span></button>
+          <a class="btn btn-ghost" href="{% url 'catalog:admin_product_list' %}"><span>Cancel</span></a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users | Atelier Souq{% endblock %}
+
+{% block extra_css %}
+<style>
+  .admin-page{padding:72px 0 30px}
+  .admin-heading{margin-bottom:28px}
+  .admin-heading h1{font-family:var(--display);font-size:clamp(2rem,4vw,3.2rem);margin:0}
+  .admin-heading p{color:var(--muted);margin:8px 0 0}
+  .role-pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+  .role-admin{background:#EFEBFE;color:var(--primary-deep)}
+  .role-customer{background:#F1F0F5;color:var(--muted)}
+  .status-pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+  .status-active{background:#E7F8F1;color:#0E8A5F}
+  .status-inactive{background:#FFF1EF;color:#C4372B}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+  <div class="wrap">
+    <div class="admin-heading">
+      <h1>Manage Users</h1>
+      <p>Promote trusted users to admin, or deactivate an account. Nothing here can be deleted from this page.</p>
+    </div>
+
+    <div class="admin-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr>
+              <td class="admin-row-name">{{ u.first_name }} {{ u.last_name }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.mobile }}</td>
+              <td>
+                {% if u.is_staff %}
+                  <span class="role-pill role-admin">Admin</span>
+                {% else %}
+                  <span class="role-pill role-customer">Customer</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.is_active %}
+                  <span class="status-pill status-active">Active</span>
+                {% else %}
+                  <span class="status-pill status-inactive">Deactivated</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="admin-actions">
+                  <form method="post" action="{% url 'catalog:admin_user_toggle_staff' u.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-edit" type="submit">
+                      <span>{% if u.is_staff %}Remove Admin{% else %}Make Admin{% endif %}</span>
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'catalog:admin_user_toggle_active' u.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-delete" type="submit">
+                      <span>{% if u.is_active %}Deactivate{% else %}Activate{% endif %}</span>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

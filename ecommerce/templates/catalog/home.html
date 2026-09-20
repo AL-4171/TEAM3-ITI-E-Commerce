@@ -118,10 +118,17 @@
 
     <div class="hero-stat">
       <h3>Right now in the collection</h3>
-      <div class="num">{{ featured|length }}+</div>
-      <div class="lbl">pieces recently added</div>
+      
       <div class="hero-stat-row">
         <div>
+          <div class="num" style="font-size:1.5rem">{{ categories|length }}</div>
+          <div class="lbl">categories</div>
+        </div>
+        <div>
+          <div class="num" style="font-size:1.5rem">{{ total_count }}</div>
+          <div class="lbl">Products</div>
+        </div>   
+             <div>
           <div class="num" style="font-size:1.5rem">2–5</div>
           <div class="lbl">days delivery</div>
         </div>
@@ -177,7 +184,7 @@
       <div class="empty">
         <h3>The collection is empty</h3>
         <p>Add your first products from the admin panel and they'll appear here.</p>
-        <a class="btn" href="/admin/catalog/product/add/"><span>Add a product</span></a>
+        <a class="btn" href="{% url 'catalog:admin_product_add' %}"><span>Add a product</span></a>
       </div>
     {% endif %}
 

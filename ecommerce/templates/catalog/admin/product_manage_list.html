@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Products | Atelier Souq{% endblock %}
+
+{% block extra_css %}
+<style>
+  .admin-page{padding:72px 0 30px}
+  .admin-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:28px;flex-wrap:wrap}
+  .admin-heading h1{font-family:var(--display);font-size:clamp(2rem,4vw,3.2rem);margin:0}
+  .admin-heading p{color:var(--muted);margin:8px 0 0}
+  .admin-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#F1EFFD}
+  .status-pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+  .status-active{background:#E7F8F1;color:#0E8A5F}
+  .status-inactive{background:#F1F0F5;color:var(--muted)}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admin-page">
+  <div class="wrap">
+    <div class="admin-heading">
+      <div>
+        <h1>Manage Products</h1>
+        <p>Add, edit, or remove products from the storefront.</p>
+      </div>
+      <a class="btn btn-accent" href="{% url 'catalog:admin_product_add' %}"><span>+ Add Product</span></a>
+    </div>
+
+    {% if products %}
+      <div class="admin-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+              <tr>
+                <td style="display:flex;align-items:center;gap:12px">
+                  {% if product.image %}<img class="admin-thumb" src="{{ product.image.url }}" alt="{{ product.name }}">{% endif %}
+                  <div>
+                    <div class="admin-row-name">{{ product.name }}</div>
+                    <div class="admin-row-sub">/{{ product.slug }}/</div>
+                  </div>
+                </td>
+                <td class="admin-row-desc">{{ product.description|truncatechars:70 }}</td>
+                <td>{{ product.category.name }}</td>
+                <td>{{ product.price }} EGP</td>
+                <td>{{ product.stock }}</td>
+                <td>
+                  {% if product.is_active %}
+                    <span class="status-pill status-active">Active</span>
+                  {% else %}
+                    <span class="status-pill status-inactive">Inactive</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="admin-actions">
+                    <a class="btn btn-edit" href="{% url 'catalog:admin_product_edit' product.pk %}"><span>Edit</span></a>
+                    <a class="btn btn-delete" href="{% url 'catalog:admin_product_delete' product.pk %}"><span>Delete</span></a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <h3>No products yet</h3>
+        <p>Add your first product to the storefront.</p>
+        <a class="btn" href="{% url 'catalog:admin_product_add' %}"><span>Add Product</span></a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

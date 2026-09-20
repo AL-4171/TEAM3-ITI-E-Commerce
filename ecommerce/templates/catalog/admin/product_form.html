@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }} | Atelier Souq{% endblock %}
+
+{% block extra_css %}
+<style>
+  .admin-form-page{padding:72px 0 30px}
+  .admin-form-shell{max-width:820px;width:100%;margin:0}
+  .admin-form-shell h1{font-family:var(--display);font-size:clamp(2rem,4vw,3.2rem);margin:0 0 8px}
+  .admin-form-intro{color:var(--muted);margin:0 0 28px}
+  .admin-form-actions{display:flex;gap:12px;margin-top:22px}
+  .admin-form input[type="checkbox"]{width:auto}
+  .current-image{margin-bottom:10px}
+  .current-image img{width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admin-form-page">
+  <div class="wrap">
+    <div class="admin-form-shell">
+      <h1>{{ page_title }}</h1>
+      <p class="admin-form-intro">Fields marked required must be filled before saving.</p>
+
+      <form class="admin-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="admin-field-error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% if form.instance.image %}
+          <div class="admin-field">
+            <label>Current Image</label>
+            <div class="current-image"><img src="{{ form.instance.image.url }}" alt="{{ form.instance.name }}"></div>
+          </div>
+        {% endif %}
+
+        {% for field in form %}
+          <div class="admin-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}
+              <div class="admin-field-error">{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+
+        <div class="admin-form-actions">
+          <button class="btn" type="submit"><span>{{ submit_label }}</span></button>
+          <a class="btn btn-ghost" href="{% url 'catalog:admin_product_list' %}"><span>Cancel</span></a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,16 +1,19 @@
+{# FILE: templates/catalog/category_products.html #}
 {% extends "base.html" %}
 
-{% block title %}{{ category.name }} — Souq Three{% endblock %}
+{% block title %}{{ category.name }} — Atelier Souq{% endblock %}
 
 {% block extra_css %}
 <style>
-  .cat-head{padding:44px 0 26px;border-bottom:1px solid var(--line);margin-bottom:28px}
-  .cat-head h1{font-family:var(--display);font-size:clamp(2rem,4.4vw,3rem);
-               font-weight:800;letter-spacing:-.03em;margin:0 0 6px}
+  .cat-head{padding:56px 0 40px;border-bottom:1px solid var(--line);margin-bottom:36px}
+  .cat-head h1{font-family:var(--display);font-size:clamp(2.2rem,4.6vw,3.4rem);
+               font-weight:700;letter-spacing:-.03em;margin:0 0 8px}
   .cat-head p{margin:0;color:var(--muted)}
-  .pager{display:flex;gap:8px;justify-content:center;margin:40px 0;flex-wrap:wrap}
-  .pager a,.pager span{padding:9px 14px;border:1px solid var(--line);font-size:.92rem}
-  .pager .on{background:var(--pine);color:var(--paper);border-color:var(--pine)}
+  .pager{display:flex;gap:10px;justify-content:center;margin:56px 0;flex-wrap:wrap}
+  .pager a,.pager span{padding:10px 18px;border:1px solid var(--line);
+                       border-radius:999px;font-size:.9rem;font-weight:600}
+  .pager .on{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .pager a:hover{border-color:var(--primary);color:var(--primary)}
 </style>
 {% endblock %}
 
@@ -25,20 +28,34 @@
   {% if products %}
     <div class="grid">
       {% for product in products %}
-        <article class="card">
+        <article class="card reveal">
           <a class="card-img" href="{% url 'catalog:product_detail' product.slug %}">
             {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% endif %}
-          </a>
-          <h3 class="card-name">
-            <a href="{% url 'catalog:product_detail' product.slug %}">{{ product.name }}</a>
-          </h3>
-          <div class="card-foot">
-            <span class="price">{{ product.price }} EGP</span>
             {% if product.in_stock %}
-              <span class="stock-in">In stock</span>
+              <span class="card-badge">In stock</span>
             {% else %}
-              <span class="stock-out">Sold out</span>
+              <span class="card-badge out">Sold out</span>
             {% endif %}
+          </a>
+          <div class="card-body">
+            <div class="card-cat">{{ product.category.name }}</div>
+            <h3 class="card-name">
+              <a href="{% url 'catalog:product_detail' product.slug %}">{{ product.name }}</a>
+            </h3>
+            <p class="card-desc">{{ product.description|truncatewords:14 }}</p>
+            <div class="card-foot">
+              <span class="price">{{ product.price }} EGP</span>
+              {% if product.in_stock %}
+                <span class="stock-in">{{ product.stock }} left</span>
+              {% else %}
+                <span class="stock-out">Unavailable</span>
+              {% endif %}
+            </div>
+            <div class="card-actions">
+              {# cart teammate: turn this into a real POST form to your add-to-cart endpoint #}
+              <a class="btn btn-ghost" href="#"><span>Add to Cart</span></a>
+              <a class="btn" href="{% url 'catalog:product_detail' product.slug %}"><span>Details</span></a>
+            </div>
           </div>
         </article>
       {% endfor %}
@@ -60,7 +77,7 @@
     <div class="empty">
       <h3>No products here yet</h3>
       <p>This category is empty for now. Have a look at the full catalogue instead.</p>
-      <a class="btn" href="{% url 'catalog:product_list' %}">Browse all products</a>
+      <a class="btn" href="{% url 'catalog:product_list' %}"><span>Browse all products</span></a>
     </div>
   {% endif %}
 

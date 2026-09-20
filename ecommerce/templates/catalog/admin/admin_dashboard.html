@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard | Atelier Souq{% endblock %}
+{% block extra_css %}
+<style>
+  .dash-page{padding:72px 0 40px}
+  .dash-page h1{font-family:var(--display);font-size:clamp(2rem,4vw,3.2rem);margin:0 0 8px}
+  .dash-page > .wrap > p{color:var(--muted);margin:0 0 36px}
+  .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+  .dash-card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px;transition:transform .25s ease,box-shadow .25s ease}
+  .dash-card:hover{transform:translateY(-4px);box-shadow:0 20px 36px -20px rgba(22,17,41,.28)}
+  .dash-card h2{font-family:var(--display);font-size:1.2rem;font-weight:600;margin:0 0 6px}
+  .dash-card .count{font-family:var(--display);font-size:2rem;font-weight:700;color:var(--primary-deep);margin:10px 0}
+  .dash-card p{color:var(--muted);font-size:.88rem;margin:0 0 18px}
+  .dash-card .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+</style>
+{% endblock %}
+{% block content %}
+<section class="dash-page">
+  <div class="wrap">
+    <h1>Admin Dashboard</h1>
+    <p>Manage the store from one place.</p>
+    <div class="dash-grid">
+      <article class="dash-card">
+        <h2>Categories</h2>
+        <div class="count">{{ category_count }}</div>
+        <p>Organize products into browsable groups.</p>
+        <div class="links">
+          <a class="btn btn-edit" href="{% url 'catalog:admin_category_list' %}"><span>Manage</span></a>
+          <a class="btn btn-accent" href="{% url 'catalog:admin_category_add' %}"><span>+ Add</span></a>
+        </div>
+      </article>
+      <article class="dash-card">
+        <h2>Products</h2>
+        <div class="count">{{ product_count }}</div>
+        <p>Add, edit, or remove items from the storefront.</p>
+        <div class="links">
+          <a class="btn btn-edit" href="{% url 'catalog:admin_product_list' %}"><span>Manage</span></a>
+          <a class="btn btn-accent" href="{% url 'catalog:admin_product_add' %}"><span>+ Add</span></a>
+        </div>
+      </article>
+
+      <article class="dash-card">
+        <h2>Orders</h2>
+        {% if order_count is not None %}
+          <div class="count">{{ order_count }}</div>
+          <p>Review and update customer orders.</p>
+          <div class="links">
+            <a class="btn btn-edit" href="{% url 'orders:admin_order_list' %}"><span>Manage</span></a>
+          </div>
+        {% else %}
+          <div class="count">—</div>
+          <p>Coming soon — the orders app isn't built yet.</p>
+        {% endif %}
+      </article>
+
+      <article class="dash-card">
+        <h2>Users</h2>
+        <div class="count">{{ user_count }}</div>
+        <p>View and manage customer accounts and staff permissions.</p>
+        <div class="links">
+            <a class="btn btn-edit" href="{% url 'catalog:admin_user_list' %}"><span>Manage Users</span></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+{% endblock %}
