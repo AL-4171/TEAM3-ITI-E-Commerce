@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | Atelier Souq{% endblock %}
+
+{% block extra_css %}
+<style>
+  .admin-form-page{padding:72px 0 40px}
+  .admin-form-shell{max-width:820px;margin:0 auto}
+  .admin-form-shell h1{
+    font-family:var(--display);
+    font-size:clamp(2rem,4vw,3.2rem);
+    margin:0 0 8px
+  }
+  .admin-form-intro{
+    color:var(--muted);
+    margin:0 0 28px
+  }
+  .admin-form{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px
+  }
+  .admin-field{
+    margin-bottom:18px
+  }
+  .admin-field label{
+    display:block;
+    font-weight:700;
+    margin-bottom:7px
+  }
+  .admin-field input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--bg)
+  }
+  .admin-field input[type="checkbox"]{
+    width:auto
+  }
+  .admin-readonly{
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#f5f3fb;
+    color:var(--muted)
+  }
+  .admin-field-help{
+    display:block;
+    color:var(--muted);
+    font-size:.82rem;
+    margin-top:5px
+  }
+  .admin-field-error{
+    color:#C4372B;
+    font-size:.82rem;
+    margin-top:5px
+  }
+  .admin-form-actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:24px
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admin-form-page">
+  <div class="wrap">
+    <div class="admin-form-shell">
+
+      <h1>{{ page_title }}</h1>
+
+      {% if managed_user %}
+        <p class="admin-form-intro">
+          Manage {{ managed_user.email }} from the custom HTML area.
+          Existing passwords are never displayed.
+        </p>
+      {% else %}
+        <p class="admin-form-intro">
+          Create a new user account from the custom HTML area.
+        </p>
+      {% endif %}
+
+      <form class="admin-form" method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="admin-field-error">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        {# EMAIL #}
+        <div class="admin-field">
+          <label for="{{ form.email.id_for_label }}">Email</label>
+
+          {% if managed_user %}
+            <div class="admin-readonly">
+              {{ managed_user.email }}
+            </div>
+
+            <small class="admin-field-help">
+              Email remains the account login identity and cannot be changed here.
+            </small>
+          {% else %}
+            {{ form.email }}
+
+            {% for error in form.email.errors %}
+              <div class="admin-field-error">
+                {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        {# PASSWORD #}
+        <div class="admin-field">
+          <label for="{{ form.new_password.id_for_label }}">
+            {{ form.new_password.label }}
+          </label>
+
+          {{ form.new_password }}
+
+          {% if managed_user %}
+            <small class="admin-field-help">
+              Leave blank to keep the current password.
+            </small>
+          {% else %}
+            <small class="admin-field-help">
+              Enter a password for the new account.
+            </small>
+          {% endif %}
+
+          {% for error in form.new_password.errors %}
+            <div class="admin-field-error">
+              {{ error }}
+            </div>
+          {% endfor %}
+        </div>
+
+        {# OTHER USER FIELDS #}
+        {% for field in form %}
+          {% if field.name != "email" and field.name != "new_password" %}
+            <div class="admin-field">
+              <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+              </label>
+
+              {{ field }}
+
+              {% for error in field.errors %}
+                <div class="admin-field-error">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        {# BUTTONS #}
+        <div class="admin-form-actions">
+          <button class="btn" type="submit">
+            <span>{{ submit_label }}</span>
+          </button>
+
+          <a
+            class="btn btn-ghost"
+            href="{% url 'catalog:admin_user_list' %}"
+          >
+            <span>Cancel</span>
+          </a>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
+

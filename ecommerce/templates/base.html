@@ -64,7 +64,11 @@
     <a href="{% url 'catalog:admin_product_add' %}">+ Add Product</a>
     {# orders teammate: uncomment once the orders app is ready #}
     {# <a href="#">Manage Orders</a> #}
-    <a href="{% url 'catalog:admin_dashboard' %}">Full Manage →</a>
+    {% if user.is_authenticated and user.is_staff %}
+    <a href="{% url 'catalog:admin_dashboard' %}">
+        Full Manage →
+    </a>
+{% endif %}
   </aside>
 {% endif %}
 

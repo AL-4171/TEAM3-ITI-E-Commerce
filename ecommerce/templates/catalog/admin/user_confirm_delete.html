@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Delete User | Atelier Souq{% endblock %}
+
+{% block extra_css %}
+<style>
+
+  .delete-page{
+    padding:80px 0;
+  }
+
+  .delete-card{
+    max-width:560px;
+    margin:0 auto;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:36px;
+    text-align:center;
+    box-shadow:0 20px 40px -28px rgba(22,17,41,.35);
+  }
+
+  .delete-icon{
+    width:64px;
+    height:64px;
+    margin:0 auto 20px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#FFF1EF;
+    color:#C4372B;
+    font-size:1.5rem;
+    font-weight:800;
+  }
+
+  .delete-card h1{
+    font-family:var(--display);
+    margin:0 0 10px;
+  }
+
+  .delete-card p{
+    color:var(--muted);
+    line-height:1.7;
+  }
+
+  .delete-email{
+    margin:18px 0;
+    padding:14px;
+    border-radius:10px;
+    background:#f7f5fb;
+    font-weight:700;
+  }
+
+  .delete-actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:26px;
+  }
+
+  .danger-btn{
+    background:#C4372B;
+    color:white;
+    border:1px solid #C4372B;
+  }
+
+  .danger-btn:hover{
+    background:#a92c22;
+  }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<section class="delete-page">
+
+  <div class="wrap">
+
+    <div class="delete-card">
+
+      <div class="delete-icon">
+        !
+      </div>
+
+      <h1>Delete User?</h1>
+
+      <p>
+        You are about to permanently delete this user account.
+        This action cannot be undone.
+      </p>
+
+      <div class="delete-email">
+        {{ managed_user.email }}
+      </div>
+
+      <form method="post">
+
+        {% csrf_token %}
+
+        <div class="delete-actions">
+
+          <a
+            class="btn btn-ghost"
+            href="{% url 'catalog:admin_user_list' %}"
+          >
+            <span>Cancel</span>
+          </a>
+
+          <button
+            class="btn danger-btn"
+            type="submit"
+          >
+            <span>Yes, Delete User</span>
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endblock %}

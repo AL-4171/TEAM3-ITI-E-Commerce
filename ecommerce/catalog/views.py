@@ -12,8 +12,12 @@ from django.db.models import Count
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import CategoryForm, ProductForm
+from .forms import CategoryForm, ProductForm , UserManageForm
 from .models import Category, Product
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 
 def home(request):
@@ -168,42 +172,6 @@ def category_list(request):
 # ============================================================
 # ADMIN — CATEGORY MANAGEMENT (staff only)
 # ============================================================
-@staff_member_required
-def admin_dashboard(request):
-    """Staff landing page for all available store-management sections."""
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-
-    context = {
-        'category_count': Category.objects.count(),
-        'product_count': Product.objects.count(),
-        'user_count': User.objects.count(),
-    }
-
-    try:
-        from orders.models import Order
-    except (ImportError, ModuleNotFoundError):
-        context['order_count'] = None
-    else:
-        context['order_count'] = Order.objects.count()
-
-    return render(request, 'catalog/admin/admin_dashboard.html', context)
-@staff_member_required
-def admin_dashboard(request):
-    """Staff landing page for all available store-management sections."""
-    context = {
-        'category_count': Category.objects.count(),
-        'product_count': Product.objects.count(),
-    }
-
-    try:
-        from orders.models import Order
-    except (ImportError, ModuleNotFoundError):
-        context['order_count'] = None
-    else:
-        context['order_count'] = Order.objects.count()
-
-    return render(request, 'catalog/admin/admin_dashboard.html', context)
 
 @staff_member_required
 def admin_category_list(request):
@@ -322,45 +290,176 @@ def admin_product_delete(request, pk):
         return redirect('catalog:admin_product_list')
     return render(request, 'catalog/admin/product_confirm_delete.html', {'product': product})
 
+# =========================================================
+# ADMIN DASHBOARD
+# =========================================================
 
+@staff_member_required
+def admin_dashboard(request):
+    return render(
+        request,
+        "catalog/admin/admin_dashboard.html",
+    )
 
-# ============================================================
-# ADMIN — USER MANAGEMENT (staff only, toggle-only, no deletion)
-# ============================================================
+# =========================================================
+# ADMIN — USER MANAGEMENT
+# =========================================================
 
 @staff_member_required
 def admin_user_list(request):
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-    users = User.objects.all().order_by('-date_joined')
-    return render(request, 'catalog/admin/user_manage_list.html', {'users': users})
+    users = User.objects.all().order_by("-date_joined")
+
+    return render(
+        request,
+        "catalog/admin/user_manage_list.html",
+        {
+            "users": users,
+        },
+    )
+
+
+@staff_member_required
+def admin_user_add(request):
+    if request.method == "POST":
+        form = UserManageForm(
+            request.POST,
+            request_user=request.user,
+        )
+
+        if form.is_valid():
+            user = form.save()
+
+            messages.success(
+                request,
+                f"User {user.get_username()} was created successfully."
+            )
+
+            return redirect("catalog:admin_user_list")
+    else:
+        form = UserManageForm(
+            request_user=request.user,
+        )
+
+    return render(
+        request,
+        "catalog/admin/user_manage_form.html",
+        {
+            "form": form,
+            "page_title": "Add User",
+            "submit_label": "Create User",
+        },
+    )
+
+
+@staff_member_required
+def admin_user_edit(request, pk):
+    managed_user = get_object_or_404(User, pk=pk)
+
+    if request.method == "POST":
+        form = UserManageForm(
+            request.POST,
+            instance=managed_user,
+            request_user=request.user,
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                "User updated successfully."
+            )
+
+            return redirect("catalog:admin_user_list")
+    else:
+        form = UserManageForm(
+            instance=managed_user,
+            request_user=request.user,
+        )
+
+    return render(
+        request,
+        "catalog/admin/user_manage_form.html",
+        {
+            "form": form,
+            "managed_user": managed_user,
+            "page_title": "Edit User",
+            "submit_label": "Save Changes",
+        },
+    )
+
+
+@staff_member_required
+def admin_user_delete(request, pk):
+    managed_user = get_object_or_404(User, pk=pk)
+
+    # Prevent an admin from deleting their own account
+    if managed_user == request.user:
+        messages.error(
+            request,
+            "You cannot delete your own account."
+        )
+        return redirect("catalog:admin_user_list")
+
+    if request.method == "POST":
+        username = managed_user.get_username()
+        managed_user.delete()
+
+        messages.success(
+            request,
+            f"User {username} was deleted successfully."
+        )
+
+        return redirect("catalog:admin_user_list")
+
+    return render(
+        request,
+        "catalog/admin/user_confirm_delete.html",
+        {
+            "managed_user": managed_user,
+        },
+    )
 
 
 @staff_member_required
 def admin_user_toggle_staff(request, pk):
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-    user_obj = get_object_or_404(User, pk=pk)
-    if request.method == 'POST':
-        if user_obj == request.user:
-            messages.error(request, "You can't change your own admin status.")
-        else:
-            user_obj.is_staff = not user_obj.is_staff
-            user_obj.save()
-            messages.success(request, f"{user_obj.email} is now {'an admin' if user_obj.is_staff else 'a customer'}.")
-    return redirect('catalog:admin_user_list')
+    managed_user = get_object_or_404(User, pk=pk)
+
+    if managed_user == request.user:
+        messages.error(
+            request,
+            "You cannot change your own staff status."
+        )
+        return redirect("catalog:admin_user_list")
+
+    managed_user.is_staff = not managed_user.is_staff
+    managed_user.save(update_fields=["is_staff"])
+
+    messages.success(
+        request,
+        "Staff status updated successfully."
+    )
+
+    return redirect("catalog:admin_user_list")
 
 
 @staff_member_required
 def admin_user_toggle_active(request, pk):
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-    user_obj = get_object_or_404(User, pk=pk)
-    if request.method == 'POST':
-        if user_obj == request.user:
-            messages.error(request, "You can't deactivate your own account.")
-        else:
-            user_obj.is_active = not user_obj.is_active
-            user_obj.save()
-            messages.success(request, f"{user_obj.email} is now {'active' if user_obj.is_active else 'deactivated'}.")
-    return redirect('catalog:admin_user_list')
+    managed_user = get_object_or_404(User, pk=pk)
+
+    if managed_user == request.user:
+        messages.error(
+            request,
+            "You cannot deactivate your own account."
+        )
+        return redirect("catalog:admin_user_list")
+
+    managed_user.is_active = not managed_user.is_active
+    managed_user.save(update_fields=["is_active"])
+
+    messages.success(
+        request,
+        "Account status updated successfully."
+    )
+
+    return redirect("catalog:admin_user_list")

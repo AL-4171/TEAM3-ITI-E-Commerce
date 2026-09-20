@@ -1,83 +1,483 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Manage Users | Atelier Souq{% endblock %}
 
 {% block extra_css %}
 <style>
-  .admin-page{padding:72px 0 30px}
-  .admin-heading{margin-bottom:28px}
-  .admin-heading h1{font-family:var(--display);font-size:clamp(2rem,4vw,3.2rem);margin:0}
-  .admin-heading p{color:var(--muted);margin:8px 0 0}
-  .role-pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
-  .role-admin{background:#EFEBFE;color:var(--primary-deep)}
-  .role-customer{background:#F1F0F5;color:var(--muted)}
-  .status-pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
-  .status-active{background:#E7F8F1;color:#0E8A5F}
-  .status-inactive{background:#FFF1EF;color:#C4372B}
+
+  .admin-page{
+    padding:72px 0 50px;
+  }
+
+  .admin-heading{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:30px;
+  }
+
+  .admin-heading h1{
+    font-family:var(--display);
+    font-size:clamp(2rem,4vw,3.2rem);
+    margin:0;
+  }
+
+  .admin-heading p{
+    color:var(--muted);
+    margin:8px 0 0;
+  }
+
+  .admin-heading-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  /* TABLE */
+
+  .admin-table{
+    overflow-x:auto;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:0 14px 35px -25px rgba(22,17,41,.35);
+  }
+
+  .admin-table table{
+    width:100%;
+    min-width:1050px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+
+  .admin-table th,
+  .admin-table td{
+    padding:20px 22px;
+    text-align:left;
+    vertical-align:middle;
+    border-bottom:1px solid var(--line);
+  }
+
+  .admin-table th{
+    background:#faf9fd;
+    color:var(--muted);
+    font-size:.72rem;
+    font-weight:800;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+
+  .admin-table th:first-child{
+    border-radius:18px 0 0 0;
+  }
+
+  .admin-table th:last-child{
+    border-radius:0 18px 0 0;
+  }
+
+  .admin-table tbody tr{
+    transition:background .2s ease;
+  }
+
+  .admin-table tbody tr:hover{
+    background:#faf9fd;
+  }
+
+  .admin-table tbody tr:last-child td{
+    border-bottom:0;
+  }
+
+  /* USER */
+
+  .user-info{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    min-width:190px;
+  }
+
+  .user-avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    background:#efebfe;
+    color:var(--primary-deep);
+    font-weight:800;
+    font-size:.9rem;
+  }
+
+  .user-name{
+    font-family:var(--display);
+    font-weight:700;
+    line-height:1.2;
+  }
+
+  .user-sub{
+    color:var(--muted);
+    font-size:.78rem;
+    margin-top:4px;
+  }
+
+  .user-email{
+    font-size:.9rem;
+  }
+
+  .user-mobile{
+    color:var(--muted);
+    font-size:.9rem;
+  }
+
+  /* STATUS */
+
+  .status-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    padding:5px 11px;
+    border-radius:999px;
+    font-size:.7rem;
+    font-weight:800;
+    white-space:nowrap;
+  }
+
+  .status-active{
+    background:#E7F8F1;
+    color:#0E8A5F;
+  }
+
+  .status-inactive{
+    background:#FFF1EF;
+    color:#C4372B;
+  }
+
+  .status-staff{
+    background:#EFEBFE;
+    color:var(--primary-deep);
+  }
+
+  /* ACTIONS */
+
+  .user-actions{
+    text-align:right !important;
+    white-space:nowrap;
+  }
+
+  .action-group{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:8px;
+  }
+
+  .action-group .btn{
+    padding:9px 13px;
+    font-size:.82rem;
+  }
+
+  .delete-btn{
+    color:#C4372B;
+    border:1px solid #F1C9C5;
+    background:#FFF7F6;
+  }
+
+  .delete-btn:hover{
+    background:#FFF1EF;
+    border-color:#E7AAA4;
+  }
+
+  /* EMPTY */
+
+  .empty{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:50px 30px;
+    text-align:center;
+  }
+
+  .empty h3{
+    font-family:var(--display);
+    margin:0 0 8px;
+  }
+
+  .empty p{
+    color:var(--muted);
+    margin:0;
+  }
+
+  .back-link{
+    display:inline-block;
+    margin-top:24px;
+    color:var(--primary);
+    font-weight:700;
+  }
+
+  @media(max-width:700px){
+
+    .admin-page{
+      padding-top:45px;
+    }
+
+    .admin-heading{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+
+    .admin-heading-actions{
+      width:100%;
+    }
+
+    .admin-heading-actions .btn{
+      width:100%;
+      justify-content:center;
+    }
+
+  }
+
 </style>
 {% endblock %}
 
+
 {% block content %}
+
 <section class="admin-page">
+
   <div class="wrap">
+
     <div class="admin-heading">
-      <h1>Manage Users</h1>
-      <p>Promote trusted users to admin, or deactivate an account. Nothing here can be deleted from this page.</p>
+
+      <div>
+        <h1>Manage Users</h1>
+
+        <p>
+          View and manage customer and staff accounts.
+        </p>
+      </div>
+
+      <div class="admin-heading-actions">
+
+        <a
+          class="btn btn-accent"
+          href="{% url 'catalog:admin_user_add' %}"
+        >
+          <span>+ Add User</span>
+        </a>
+
+      </div>
+
     </div>
 
-    <div class="admin-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Mobile</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th style="text-align:right">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for u in users %}
+
+    {% if users %}
+
+      <div class="admin-table">
+
+        <table>
+
+          <thead>
+
             <tr>
-              <td class="admin-row-name">{{ u.first_name }} {{ u.last_name }}</td>
-              <td>{{ u.email }}</td>
-              <td>{{ u.mobile }}</td>
-              <td>
-                {% if u.is_staff %}
-                  <span class="role-pill role-admin">Admin</span>
-                {% else %}
-                  <span class="role-pill role-customer">Customer</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if u.is_active %}
-                  <span class="status-pill status-active">Active</span>
-                {% else %}
-                  <span class="status-pill status-inactive">Deactivated</span>
-                {% endif %}
-              </td>
-              <td>
-                <div class="admin-actions">
-                  <form method="post" action="{% url 'catalog:admin_user_toggle_staff' u.pk %}">
-                    {% csrf_token %}
-                    <button class="btn btn-edit" type="submit">
-                      <span>{% if u.is_staff %}Remove Admin{% else %}Make Admin{% endif %}</span>
-                    </button>
-                  </form>
-                  <form method="post" action="{% url 'catalog:admin_user_toggle_active' u.pk %}">
-                    {% csrf_token %}
-                    <button class="btn btn-delete" type="submit">
-                      <span>{% if u.is_active %}Deactivate{% else %}Activate{% endif %}</span>
-                    </button>
-                  </form>
-                </div>
-              </td>
+              <th>ID</th>
+              <th>User</th>
+              <th>Email</th>
+              <th>Mobile</th>
+              <th>Account</th>
+              <th>Joined</th>
+              <th>Last Login</th>
+              <th class="user-actions">Actions</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+
+          </thead>
+
+
+          <tbody>
+
+            {% for managed_user in users %}
+
+              <tr>
+
+                <td>
+                  #{{ managed_user.pk }}
+                </td>
+
+
+                <td>
+
+                  <div class="user-info">
+
+                    <div class="user-avatar">
+                      {{ managed_user.email|first|upper }}
+                    </div>
+
+                    <div>
+
+                      <div class="user-name">
+                        {{ managed_user.get_full_name|default:"Unnamed user" }}
+                      </div>
+
+                      <div class="user-sub">
+
+                        {% if managed_user.is_superuser %}
+                          Superuser
+                        {% elif managed_user.is_staff %}
+                          Staff
+                        {% else %}
+                          Customer
+                        {% endif %}
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+
+                <td>
+                  <div class="user-email">
+                    {{ managed_user.email }}
+                  </div>
+                </td>
+
+
+                <td>
+
+                  <div class="user-mobile">
+                    {{ managed_user.mobile|default:"—" }}
+                  </div>
+
+                </td>
+
+
+                <td>
+
+                  <div class="status-group">
+
+                    {% if managed_user.is_active %}
+
+                      <span class="status-pill status-active">
+                        Active
+                      </span>
+
+                    {% else %}
+
+                      <span class="status-pill status-inactive">
+                        Inactive
+                      </span>
+
+                    {% endif %}
+
+
+                    {% if managed_user.is_staff %}
+
+                      <span class="status-pill status-staff">
+                        Staff
+                      </span>
+
+                    {% endif %}
+
+                  </div>
+
+                </td>
+
+
+                <td>
+                  {{ managed_user.date_joined|date:"M d, Y" }}
+                </td>
+
+
+                <td>
+
+                  {% if managed_user.last_login %}
+                    {{ managed_user.last_login|date:"M d, Y H:i" }}
+                  {% else %}
+                    Never
+                  {% endif %}
+
+                </td>
+
+
+                <td class="user-actions">
+
+                  <div class="action-group">
+
+                    <a
+                      class="btn btn-edit"
+                      href="{% url 'catalog:admin_user_edit' managed_user.pk %}"
+                    >
+                      <span>Edit</span>
+                    </a>
+
+
+                    {% if managed_user != request.user %}
+
+                      <a
+                        class="btn delete-btn"
+                        href="{% url 'catalog:admin_user_delete' managed_user.pk %}"
+                      >
+                        <span>Delete</span>
+                      </a>
+
+                    {% endif %}
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    {% else %}
+
+      <div class="empty">
+
+        <h3>No users yet</h3>
+
+        <p>
+          Registered accounts will appear here.
+        </p>
+
+        <a
+          class="btn btn-accent"
+          href="{% url 'catalog:admin_user_add' %}"
+          style="margin-top:20px;"
+        >
+          <span>+ Add First User</span>
+        </a>
+
+      </div>
+
+    {% endif %}
+
+
+    <a
+      class="back-link"
+      href="{% url 'catalog:admin_dashboard' %}"
+    >
+      ← Back to Dashboard
+    </a>
+
   </div>
+
 </section>
+
 {% endblock %}
