@@ -5,10 +5,57 @@
 
 {% block extra_css %}
 <style>
-  .page-head{padding:56px 0 40px}
+  .page-head{padding:56px 0 30px}
   .page-head h1{font-family:var(--display);font-size:clamp(2.2rem,4.6vw,3.4rem);
                 font-weight:700;letter-spacing:-.03em;margin:0 0 8px}
   .page-head p{margin:0;color:var(--muted)}
+
+  /* Filter Bar Styling */
+  .filter-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 28px 0 36px;
+  }
+  .filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .filter-group {
+    flex: 1;
+    min-width: 160px;
+  }
+  .filter-input, .filter-select {
+    width: 100%;
+    padding: 10px 16px;
+    background: var(--bg, #09090b);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .filter-input:focus, .filter-select:focus {
+    border-color: var(--primary);
+  }
+  .price-range {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    max-width: 220px;
+  }
+  .price-range input {
+    width: 50%;
+    text-align: center;
+  }
+  .filter-actions {
+    display: flex;
+    gap: 8px;
+  }
 
   .result-line{font-size:.9rem;color:var(--muted);margin-bottom:28px}
 
@@ -37,12 +84,58 @@
   <div class="page-head">
     <h1>The full collection</h1>
     <p>Every active piece, in one place.</p>
-    {# Filter teammate: add your search/category/price/sort form here #}
-    {# once it's ready — this page intentionally has no filtering yet. #}
+  </div>
+
+  <!-- Filter & Search Bar Section -->
+  <div class="filter-box">
+    <form method="GET" action="{% url 'catalog:product_list' %}" class="filter-form">
+      
+      <!-- Search Input -->
+      <div class="filter-group" style="flex: 2; min-width: 200px;">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search by name..." class="filter-input">
+      </div>
+
+      <!-- Category Filter -->
+      <div class="filter-group">
+        <select name="category" class="filter-select">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Price Min & Max -->
+      <div class="price-range">
+        <input type="number" name="min_price" value="{{ min_price }}" placeholder="Min" step="0.01" class="filter-input">
+        <span style="color:var(--muted);">-</span>
+        <input type="number" name="max_price" value="{{ max_price }}" placeholder="Max" step="0.01" class="filter-input">
+      </div>
+
+      <!-- Sort By -->
+      <div class="filter-group">
+        <select name="sort" class="filter-select">
+          <option value="">Sort By</option>
+          <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+          <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Name: A to Z</option>
+          <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>Name: Z to A</option>
+        </select>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="filter-actions">
+        <button type="submit" class="btn"><span>Filter</span></button>
+        <a href="{% url 'catalog:product_list' %}" class="btn btn-ghost"><span>Reset</span></a>
+      </div>
+
+    </form>
   </div>
 
   {% if products %}
-    <p class="result-line">{{ total_count }} product{{ total_count|pluralize }}.</p>
+    <p class="result-line">{{ total_count }} product{{ total_count|pluralize }} found.</p>
 
     <div class="grid">
       {% for product in products %}
@@ -72,7 +165,6 @@
               {% endif %}
             </div>
             <div class="card-actions">
-              {# cart teammate: turn this into a real POST form to your add-to-cart endpoint #}
               <a class="btn btn-ghost" href="#"><span>Add to Cart</span></a>
               <a class="btn" href="{% url 'catalog:product_detail' product.slug %}"><span>Details</span></a>
             </div>
@@ -81,25 +173,30 @@
       {% endfor %}
     </div>
 
+    <!-- Pagination Navbar (with filter parameters retained) -->
     {% if page_obj.has_other_pages %}
       <nav class="pager">
         {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+          <a href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&category={{ selected_category }}&min_price={{ min_price }}&max_price={{ max_price }}&sort={{ sort_by }}">Previous</a>
         {% endif %}
+
         <span class="on">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}">Next</a>
+          <a href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&category={{ selected_category }}&min_price={{ min_price }}&max_price={{ max_price }}&sort={{ sort_by }}">Next</a>
         {% endif %}
       </nav>
     {% endif %}
 
   {% else %}
-    <div class="empty">
-      <h3>The collection is empty</h3>
-      <p>Add your first products from the admin panel.</p>
-      <a class="btn" href="/admin/catalog/product/add/"><span>Add a product</span></a>
+    <!-- Friendly Empty Message -->
+    <div class="empty" style="text-align: center; padding: 60px 20px;">
+      <div style="font-size: 3rem; margin-bottom: 12px;">🔍</div>
+      <h3>No products found</h3>
+      <p style="color: var(--muted); margin-bottom: 20px;">We couldn't find anything matching your search criteria. Try adjusting your filters.</p>
+      <a class="btn" href="{% url 'catalog:product_list' %}"><span>Clear all filters</span></a>
     </div>
   {% endif %}
 
 </div>
-{% endblock %}
+{% endblock %} 
