@@ -1,6 +1,5 @@
 from decimal import Decimal
-from ecommerce.settings import settings  # أو حسب اسم مشروعك للـ settings
-# نفترض إن الـ Product model هيجيلك من تطبيق الـ products بتاع زميلك
+from django.conf import settings
 from catalog.models import Product
 
 class Cart:
@@ -8,7 +7,6 @@ class Cart:
         self.session = request.session
         cart = self.session.get('cart')
         if not cart:
-            # لو مفيش كارت في السيッション، أنشئ كارت فاضي
             cart = self.session['cart'] = {}
         self.cart = cart
 
@@ -24,7 +22,6 @@ class Cart:
         self.save()
 
     def save(self):
-        # تحديث الـ session
         self.session.modified = True
 
     def remove(self, product):
@@ -48,6 +45,5 @@ class Cart:
         return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
 
     def clear(self):
-        # تفريغ العربة من الـ session
         del self.session['cart']
         self.save()

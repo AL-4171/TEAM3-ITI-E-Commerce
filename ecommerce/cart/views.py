@@ -6,21 +6,28 @@ def cart_detail(request):
   return render(request, 'cart/cart_detail.html', {'cart': cart})
 
 def add_to_cart(request, product_id):
-  product = get_object_or_404(Product, id=product_id)
-  cart = request.session.get('cart', {})
+    product = get_object_or_404(Product, id=product_id)
+    cart = request.session.get('cart', {})
+    
+    quantity = int(request.POST.get('quantity', 1))
 
-  if str(product_id) in cart:
-    cart[str(product_id)]['quantity'] += 1
-  else:
-    cart[str(product_id)] = {
-        'name': product.name,
-        'price': str(product.price),
-        'quantity': 1,
-    }
+    if str(product_id) in cart:
+        cart[str(product_id)]['quantity'] += quantity
+    else:
+        cart[str(product_id)] = {
+            'name': product.name,
+            'price': str(product.price),
+            'quantity': quantity,
+        }
 
-  request.session['cart'] = cart
-  request.session.modified = True
-  return redirect('cart:cart_detail')
+    request.session['cart'] = cart
+    request.session.modified = True
+
+    if request.GET.get('next') == 'checkout':
+        return redirect('payment:checkout')
+        
+    return redirect('cart:cart_detail')
+
 
 def increment_quantity(request, product_id):
   cart = request.session.get('cart', {})
