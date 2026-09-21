@@ -132,6 +132,7 @@
               {% if product.in_stock %}<span class="stock-in">{{ product.stock }} left</span>{% else %}<span class="stock-out">Unavailable</span>{% endif %}
             </div>
             <div class="card-actions">
+              <a class="btn btn-ghost" href="{% url 'cart:add_to_cart' product.id %}"><span>Add to Cart</span></a>
               <a class="btn" href="{% url 'catalog:product_detail' product.slug %}"><span>Details</span></a>
             </div>
           </div>

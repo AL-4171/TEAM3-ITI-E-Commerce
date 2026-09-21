@@ -169,7 +169,7 @@
   /* ACTIONS */
 
   .user-actions{
-    text-align:right !important;
+    text-align:center !important;
     white-space:nowrap;
   }
 
@@ -185,16 +185,7 @@
     font-size:.82rem;
   }
 
-  .delete-btn{
-    color:#C4372B;
-    border:1px solid #F1C9C5;
-    background:#FFF7F6;
-  }
-
-  .delete-btn:hover{
-    background:#FFF1EF;
-    border-color:#E7AAA4;
-  }
+  
 
   /* EMPTY */
 
@@ -424,7 +415,7 @@
                     {% if managed_user != request.user %}
 
                       <a
-                        class="btn delete-btn"
+                        class="btn btn-delete"
                         href="{% url 'catalog:admin_user_delete' managed_user.pk %}"
                       >
                         <span>Delete</span>

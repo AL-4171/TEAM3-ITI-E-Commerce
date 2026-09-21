@@ -12,15 +12,16 @@ class PaymentForm(forms.Form):
         widget=forms.Select(attrs={'class': 'admin-input', 'id': 'id_payment_method'})
     )
 
-    # Credit Card Fields
     card_number = forms.CharField(
-        max_length=14,
+        max_length=16,
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'admin-input',
             'id': 'id_card_number',
-            'placeholder': '12345678901234',
-            'maxlength': '14'
+            'placeholder': '16-digit Card Number',
+            'maxlength': '16',
+            'inputmode': 'numeric',
+            'autocomplete': 'off'
         })
     )
     expiry_date = forms.CharField(
@@ -28,9 +29,11 @@ class PaymentForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'admin-input',
-            'id': 'id_expiry_date',
+            'id': 'id_card_expiry',
             'placeholder': 'MM/YY',
-            'maxlength': '5'
+            'maxlength': '5',
+            'inputmode': 'numeric',
+            'autocomplete': 'off'
         })
     )
     cvv = forms.CharField(
@@ -40,11 +43,11 @@ class PaymentForm(forms.Form):
             'class': 'admin-input',
             'id': 'id_cvv',
             'placeholder': '123',
-            'maxlength': '3'
+            'maxlength': '3',
+            'autocomplete': 'off'
         })
     )
 
-    # Mobile Wallet Fields
     wallet_number = forms.CharField(
         max_length=11,
         required=False,
@@ -72,14 +75,13 @@ class PaymentForm(forms.Form):
         cleaned_data = super().clean()
         method = cleaned_data.get('payment_method')
 
-        # Validation for Credit Card
         if method == 'credit_card':
             card_number = cleaned_data.get('card_number')
             expiry_date = cleaned_data.get('expiry_date')
             cvv = cleaned_data.get('cvv')
 
-            if not card_number or len(card_number) != 14 or not card_number.isdigit():
-                self.add_error('card_number', 'Card number must be exactly 14 digits.')
+            if not card_number or len(card_number) != 16 or not card_number.isdigit():
+                self.add_error('card_number', 'Card number must be exactly 16 digits.')
 
             if not expiry_date or len(expiry_date) != 5 or '/' not in expiry_date:
                 self.add_error('expiry_date', 'Enter a valid date in MM/YY format.')
@@ -87,7 +89,6 @@ class PaymentForm(forms.Form):
             if not cvv or len(cvv) != 3 or not cvv.isdigit():
                 self.add_error('cvv', 'CVV must be 3 digits.')
 
-        # Validation for Mobile Wallet
         elif method == 'wallet':
             wallet_number = cleaned_data.get('wallet_number')
             wallet_password = cleaned_data.get('wallet_password')

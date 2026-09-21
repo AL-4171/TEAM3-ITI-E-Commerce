@@ -5,16 +5,22 @@
     <div class="admin-form" style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
         <h2 style="font-family: var(--display); text-align: center; margin-bottom: 24px;">Payment Checkout</h2>
 
-        <form method="POST">
+
+        <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+         <h4 style="margin: 0 0 10px 0;">Order Summary</h4>
+           <p style="margin: 0; font-size: 1.1rem; font-weight: bold;">
+           Total Amount: <span style="color: var(--brand, #6c5ce7);">{{ total_price }} EGP</span>
+           </p>
+        </div>
+
+        <form method="POST" autocomplete="off">
             {% csrf_token %}
 
-            <!-- Payment Method Dropdown -->
             <div class="form-group" style="margin-bottom: 16px;">
                 <label>Payment Method</label>
                 {{ form.payment_method }}
             </div>
 
-            <!-- Credit Card Fields Wrapper -->
             <div id="credit_card_fields">
                 <div class="form-group" style="margin-bottom: 16px;">
                     <label>Card Number</label>
@@ -49,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- Submit Button -->
             <div style="margin-top: 24px;">
                 <button type="submit" class="btn" style="width: 100%; text-align: center;">
                     <span>Pay Now</span>
@@ -59,13 +64,21 @@
     </div>
 </div>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const paymentSelect = document.getElementById('id_payment_method');
     const cardFields = document.getElementById('credit_card_fields');
     const walletFields = document.getElementById('wallet_fields');
 
+    const cardNumberInput = document.getElementById('id_card_number');
+    const cardExpiryInput = document.getElementById('id_card_expiry');
+    const cardCvvInput = document.getElementById('id_cvv');
+    const walletNumberInput = document.getElementById('id_wallet_number');
+    const walletPinInput = document.getElementById('id_wallet_password');
+
     function toggleFields() {
+        if (!paymentSelect) return;
         const selected = paymentSelect.value;
         if (selected === 'credit_card') {
             cardFields.style.display = 'block';
@@ -74,25 +87,42 @@ document.addEventListener('DOMContentLoaded', function() {
             cardFields.style.display = 'none';
             walletFields.style.display = 'block';
         } else {
-            // Cash on Delivery
             cardFields.style.display = 'none';
             walletFields.style.display = 'none';
         }
     }
 
-    paymentSelect.addEventListener('change', toggleFields);
-    toggleFields(); // Initial check on load
+    if (paymentSelect) {
+        paymentSelect.addEventListener('change', toggleFields);
+        toggleFields();
+    }
 
+    const numericInputs = [cardNumberInput, cardCvvInput, walletNumberInput, walletPinInput];
 
+    numericInputs.forEach(input => {
+        if (input) {
+            input.addEventListener('keydown', function(e) {
+                const allowedKeys = ['Backspace', 'Tab', 'Delete', 'ArrowLeft', 'ArrowRight'];
+                if (allowedKeys.includes(e.key)) return;
 
-});
-const walletNumberInput = document.getElementById('id_wallet_number');
-const walletPinInput = document.getElementById('id_wallet_password');
+                if (!/^[0-9]$/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
 
-[walletNumberInput, walletPinInput].forEach(input => {
-    if (input) {
-        input.addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+    });
+
+    if (cardExpiryInput) {
+        cardExpiryInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/[^0-9]/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            this.value = value;
         });
     }
 });

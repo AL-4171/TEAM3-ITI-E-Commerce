@@ -16,7 +16,7 @@
   .category-name{font-family:var(--display);font-size:1.1rem;font-weight:600}
   .category-description{color:var(--muted);max-width:460px}
    .products-col{width:110px;text-align:center;white-space:nowrap}
-   .actions-col{width:220px;text-align:right;white-space:nowrap}
+   .actions-col{width:200px;text-align:center;white-space:nowrap}
    .admin-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center}
   .admin-actions .btn{padding:8px 14px;font-size:.78rem}
   @media (max-width:700px){.admin-heading{align-items:start;flex-direction:column}.admin-table{overflow-x:auto}.admin-table table{min-width:620px}}
@@ -42,7 +42,7 @@
               <th scope="col">Category</th>
               <th scope="col">Description</th>
               <th scope="col" class="products-col">Products</th>
-               <th scope="col" class="actions-col">Actions</th>
+               <th scope="col" class="actions-col" style="text-align: center;">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -53,8 +53,8 @@
                 <td class="products-col">{{ category.product_count }}</td>
                  <td class="actions-col">
                   <div class="admin-actions">
-                    <a class="btn btn-ghost" href="{% url 'catalog:admin_category_edit' category.pk %}"><span>Edit</span></a>
-                    <a class="btn btn-ghost" href="{% url 'catalog:admin_category_delete' category.pk %}"><span>Delete</span></a>
+                    <a class="btn btn-edit" href="{% url 'catalog:admin_category_edit' category.pk %}"><span>Edit</span></a>
+                    <a class="btn btn-delete" href="{% url 'catalog:admin_category_delete' category.pk %}"><span>Delete</span></a>
                   </div>
                 </td>
               </tr>

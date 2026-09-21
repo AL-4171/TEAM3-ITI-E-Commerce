@@ -146,18 +146,24 @@
         form (or the submit button) in {% if user.is_authenticated %}
         if guests should not be able to add to cart / buy directly.
       {% endcomment %}
-      <form class="buy" method="post" action="#">
-        {% csrf_token %}
+      <form class="buy" method="post" action="{% url 'cart:add_to_cart' product.id %}">
+          {% csrf_token %}
         <div class="qty">
           <label for="quantity">Quantity</label>
           <input type="number" id="quantity" name="quantity" value="1"
-                 min="1" max="{{ product.stock }}" {% if not product.in_stock %}disabled{% endif %}>
+           min="1" max="{{ product.stock }}" {% if not product.in_stock %}disabled{% endif %}>
         </div>
-        <button class="btn" type="submit" {% if not product.in_stock %}disabled{% endif %}>
-          <span>{% if product.in_stock %}Add to Cart{% else %}Unavailable{% endif %}</span>
-        </button>
-        {# orders teammate: replace href="#" with the real checkout URL #}
-        <a class="btn btn-accent" href="{% url 'payment:checkout' %}"><span>{% if product.in_stock %}Buy Now{% else %}Unavailable{% endif %}</span></a>
+
+             <!--  Zorar Add to Cart -->
+       <button type="submit" name="action" value="add_to_cart" class="btn" {% if not product.in_stock %}disabled{% endif %}>
+         <span>{% if product.in_stock %}Add to Cart{% else %}Unavailable{% endif %}</span>
+       </button>
+
+                <!-- 2. Zorar Buy Now (bi-ye'mel POST le-checkout) -->
+       <button type="submit" formmethod="post" formaction="{% url 'cart:add_to_cart' product.id %}?next=checkout" class="btn btn-accent" {% if not product.in_stock %}disabled{% endif %}>
+         <span>{% if product.in_stock %}Buy Now{% else %}Unavailable{% endif %}</span>
+       </button>
+
         <a class="btn btn-ghost" href="{% url 'catalog:product_list' %}"><span>Keep browsing</span></a>
       </form>
     </div>

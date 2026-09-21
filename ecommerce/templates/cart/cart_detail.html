@@ -1,0 +1,371 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart | Electr Store{% endblock %}
+
+{% block extra_css %}
+<style>
+  .cart-page {
+    padding: 72px 0 40px;
+  }
+
+  .cart-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .cart-title {
+    font-family: var(--display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .cart-intro {
+    color: var(--muted);
+    margin: 0 0 28px;
+  }
+
+  /* Cart table */
+  .cart-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -30px rgba(22, 17, 41, 0.3);
+  }
+
+  .cart-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .cart-table th {
+    padding: 15px 18px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .cart-table td {
+    padding: 18px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+
+  .cart-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .cart-table tbody tr {
+    transition: background 0.2s ease;
+  }
+
+  .cart-table tbody tr:hover {
+    background: #fbfaff;
+  }
+
+  .product-name {
+    font-family: var(--display);
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .product-price {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .subtotal {
+    color: var(--primary-deep);
+    font-family: var(--display);
+    font-weight: 700;
+  }
+
+  /* Quantity */
+  .quantity-control {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .quantity-control a {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+
+  .quantity-control a:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .quantity-number {
+    min-width: 34px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  /* Remove button */
+  .remove-btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #f1c7c2;
+    background: #fff7f5;
+    color: #c4372b;
+    font-size: 0.78rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+
+  .remove-btn:hover {
+    background: #c4372b;
+    border-color: #c4372b;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  /* Cart Actions */
+.cart-actions{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:12px;
+    margin-top:22px;
+}
+
+.cart-actions .clear-btn{
+    border-color:#F1C7C2;
+    color:#C4372B;
+}
+
+.cart-actions .clear-btn:hover{
+    background:#C4372B;
+    border-color:#C4372B;
+    color:#fff;
+}
+
+  .cart-actions .btn-accent{
+    margin-top:0;
+   }
+
+  /* Empty cart */
+  .empty-cart {
+    padding: 65px 25px;
+    text-align: center;
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: 18px;
+  }
+
+  .empty-cart-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    font-size: 1.5rem;
+  }
+
+  .empty-cart h4 {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    margin: 0 0 8px;
+  }
+
+  .empty-cart p {
+    color: var(--muted);
+    margin: 0 0 22px;
+  }
+
+  
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<section class="cart-page">
+  <div class="wrap">
+
+    <div class="cart-shell">
+
+      <h1 class="cart-title">🛒 Shopping Cart</h1>
+
+      <p class="cart-intro">
+        Review the items you've selected before checkout.
+      </p>
+
+      {% if cart %}
+
+        <div class="cart-box">
+
+          <table class="cart-table">
+
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+
+            <tbody>
+
+              {% for product_id, item in cart.items %}
+
+                <tr>
+                 
+                  <td>
+                    <span class="product-name">
+                      
+                      {{ item.name }}
+                    </span>
+                  </td>
+
+
+                  <td>
+                    <span class="product-price">
+                      ${{ item.price }}
+                    </span>
+                  </td>
+
+
+                  <td>
+
+                    <div class="quantity-control">
+
+                      <!-- Decrement Quantity Button -->
+                      <a
+                        href="{% url 'cart:decrement_quantity' product_id %}"
+                        aria-label="Decrease quantity"
+                      >
+                        −
+                      </a>
+
+
+                      <span class="quantity-number">
+                        {{ item.quantity }}
+                      </span>
+
+
+                      <!-- Increment Quantity Button -->
+                      <a
+                        href="{% url 'cart:increment_quantity' product_id %}"
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </a>
+
+                    </div>
+
+                  </td>
+
+
+                  <td>
+
+                    <span class="subtotal">
+                      ${% widthratio item.price 1 item.quantity %}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <!-- Remove Item Button -->
+                    <a
+                      href="{% url 'cart:remove_from_cart' product_id %}"
+                      class="remove-btn"
+                    >
+                      Remove
+                    </a>
+
+                  </td>
+
+                </tr>
+
+              {% endfor %}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        
+        <!-- Cart Actions -->
+        <div class="cart-actions">
+
+            <a
+                href="{% url 'cart:clear_cart' %}"
+                class="btn btn-ghost clear-btn"
+            >
+                <span>Clear Cart</span>
+            </a>
+
+            <a href="{% url 'payment:checkout' %}" class="btn btn-accent" >
+             <span>Proceed to Checkout</span>
+            </a>
+                
+
+        </div>
+
+
+      {% else %}
+
+
+        <div class="empty-cart">
+
+          <div class="empty-cart-icon">
+            🛒
+          </div>
+
+
+          <h4>
+            Your Shopping Cart is Empty!
+          </h4>
+
+
+          <p>
+            Browse our products and add your favorites to the cart.
+          </p>
+
+
+          <a
+            href="{% url 'catalog:product_list' %}"
+            class="btn"
+          >
+            <span>Shop Now</span>
+          </a>
+
+        </div>
+
+
+      {% endif %}
+
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
