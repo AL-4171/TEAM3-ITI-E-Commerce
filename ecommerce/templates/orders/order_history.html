@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}My Orders | Electro Store{% endblock %}
+{% block extra_css %}
+<style>
+    .orders-page {
+        padding: 64px 0 40px
+    }
+
+    .orders-page h1 {
+        font-family: var(--display);
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        margin: 0 0 8px
+    }
+
+    .orders-page .intro {
+        color: var(--muted);
+        margin: 0 0 30px
+    }
+
+    .order-list {
+        display: grid;
+        gap: 14px
+    }
+
+    .order-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px 24px
+    }
+
+    .order-row h2 {
+        font-family: var(--display);
+        font-size: 1.15rem;
+        margin: 0 0 8px
+    }
+
+    .order-meta {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: .92rem
+    }
+
+    .order-total {
+        font-weight: 700;
+        color: var(--ink)
+    }
+
+    @media(max-width:600px) {
+        .order-row {
+            align-items: flex-start;
+            flex-direction: column
+        }
+
+        .order-row .btn {
+            width: 100%;
+            text-align: center
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<section class="orders-page">
+    <div class="wrap">
+        <h1>My Orders</h1>
+        <p class="intro">Review your previous purchases.</p>
+        {% if orders %}
+        <div class="order-list">
+            {% for order in orders %}
+            <article class="order-row">
+                <div>
+                    <h2>Order #{{ order.id }}</h2>
+                    <div class="order-meta">
+                        <span>{{ order.created_at|date:"F j, Y, g:i a" }}</span>
+                        <span class="order-total">Total: {{ order.total }}</span>
+                    </div>
+                </div>
+                <a class="btn btn-edit" href="{% url 'orders:order_detail' order.id %}"><span>View Details</span></a>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">You have no previous orders.</div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

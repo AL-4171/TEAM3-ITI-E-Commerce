@@ -2,54 +2,70 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}E-Commerce Electro Store{% endblock %}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/base.css' %}">
-{% block extra_css %}{% endblock %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}E-Commerce Electro Store{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block extra_css %}{% endblock %}
 </head>
+
 <body>
 
-<header class="top" id="siteHeader">
-  <div class="wrap top-in">
-    <a class="brand" href="{% url 'catalog:home' %}"><span class="brand-dot"></span>Electro Store</a>
+  <header class="top" id="siteHeader">
+    <div class="wrap top-in">
+      <a class="brand" href="{% url 'catalog:home' %}"><span class="brand-dot"></span>Electro Store</a>
 
-    <nav class="nav">
-      <a href="{% url 'catalog:home' %}">Home</a>
-      <a href="{% url 'catalog:product_list' %}">Products</a>
-      <a href="{% url 'catalog:category_list' %}">Categories</a>
-      {% if user.is_authenticated %}
+      <nav class="nav">
+        <a href="{% url 'catalog:home' %}">Home</a>
+        <a href="{% url 'catalog:product_list' %}">Products</a>
+        <a href="{% url 'catalog:category_list' %}">Categories</a>
+        {% if user.is_authenticated %}
         {% if user.is_staff %}
-          <a href="#">All Orders</a>
+        <a href="{% url 'orders:order_history' %}">My Orders</a>
         {% else %}
-          {# orders teammate: replace href="#" with {% url 'orders:list' %} once ready #}
-          <a href="#">My Orders</a>
+        <a href="{% url 'orders:order_history' %}">My Orders</a>
         {% endif %}
         <a href="{% url 'accounts:profile' %}">Profile</a>
-      {% endif %}
-    </nav>
+        {% endif %}
+      </nav>
 
-    <div class="nav-act">
-      {# cart teammate: replace href="#" with once ready #}
-      <a class="btn btn-ghost" href="{% url 'cart:cart_detail' %}"><span>Cart</span></a>
-      {% if user.is_authenticated %}
+      <div class="nav-act">
+        {# cart teammate: replace href="#" with once ready #}
+        <a class="btn btn-ghost" href="{% url 'cart:cart_detail' %}"><span>Cart</span></a>
+        {% if user.is_authenticated %}
         <a class="btn" href="{% url 'accounts:profile' %}">
-          <span>{% if user.is_staff %}Admin, {{ user.first_name }}{% else %}{{ user.first_name|default:"Account" }}{% endif %}</span>
+          <span>
+            {% if user.is_staff %}
+            Admin, {{ user.first_name }}
+            {% else %}
+            {{ user.first_name|default:"Account" }}
+            {% endif %}
+          </span>
         </a>
-        <a class="btn btn-ghost" href="{% url 'accounts:logout' %}"><span>Log out</span></a>
-      {% else %}
-        <a class="btn btn-ghost" href="{% url 'accounts:login' %}"><span>Log in</span></a>
-        <a class="btn" href="{% url 'accounts:register' %}"><span>Sign up</span></a>
-      {% endif %}
-    </div>
-  </div>
-</header>
 
-{% if user.is_authenticated and user.is_staff %}
+        <a class="btn btn-ghost" href="{% url 'accounts:logout' %}">
+          <span>Log out</span>
+        </a>
+        {% else %}
+        <a class="btn btn-ghost" href="{% url 'accounts:login' %}">
+          <span>Log in</span>
+        </a>
+        <a class="btn" href="{% url 'accounts:register' %}">
+          <span>Sign up</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% if user.is_authenticated and user.is_staff %}
   <div class="admin-overlay" id="adminOverlay"></div>
   <button class="admin-toggle" id="adminToggle" title="Open Admin Panel">
     <span class="icon">⚙</span><span>Admin Panel</span>
@@ -62,38 +78,38 @@
     <a href="{% url 'catalog:admin_category_add' %}">+ Add Category</a>
     <a href="{% url 'catalog:admin_product_list' %}">Manage Products</a>
     <a href="{% url 'catalog:admin_product_add' %}">+ Add Product</a>
-    {# orders teammate: uncomment once the orders app is ready #}
-    {# <a href="#">Manage Orders</a> #}
+    <a href="{% url 'orders:admin_order_list' %}">Manage Orders</a>
     {% if user.is_authenticated and user.is_staff %}
     <a href="{% url 'catalog:admin_dashboard' %}">
-        Full Manage →
+      Full Manage →
     </a>
-{% endif %}
+    {% endif %}
   </aside>
-{% endif %}
+  {% endif %}
 
-<main>
-  {% if messages %}
+  <main>
+    {% if messages %}
     <div class="toast-stack" id="toastStack">
       {% for message in messages %}
-        <div class="toast toast-{{ message.tags }}">
-          <span>{{ message }}</span>
-          <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
-        </div>
+      <div class="toast toast-{{ message.tags }}">
+        <span>{{ message }}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+      </div>
       {% endfor %}
     </div>
-  {% endif %}
-  {% block content %}{% endblock %}
-</main>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
 
-<footer class="foot">
-  <div class="wrap foot-in">
-    <div>Electronics E-commerce — ITI final project, Team 3.</div>
-    <div>Crafted with Django.</div>
-  </div>
-</footer>
+  <footer class="foot">
+    <div class="wrap foot-in">
+      <div>Electronics E-commerce — ITI final project, Team 3.</div>
+      <div>Crafted with Django.</div>
+    </div>
+  </footer>
 
 
-<script src="{% static 'js/base.js' %}"></script>
+  <script src="{% static 'js/base.js' %}"></script>
 </body>
+
 </html>
