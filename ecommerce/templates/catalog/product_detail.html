@@ -153,9 +153,9 @@
           <input type="number" id="quantity" name="quantity" value="1"
                  min="1" max="{{ product.stock }}" {% if not product.in_stock %}disabled{% endif %}>
         </div>
-        <button class="btn" type="submit" {% if not product.in_stock %}disabled{% endif %}>
+        <a href="{% url 'cart:add_to_cart' product.id %}" class="btn" type="submit" {% if not product.in_stock %}disabled{% endif %}>
           <span>{% if product.in_stock %}Add to Cart{% else %}Unavailable{% endif %}</span>
-        </button>
+        </a>
         {# orders teammate: replace href="#" with the real checkout URL #}
         <a class="btn btn-accent" href="#"><span>{% if product.in_stock %}Buy Now{% else %}Unavailable{% endif %}</span></a>
         <a class="btn btn-ghost" href="{% url 'catalog:product_list' %}"><span>Keep browsing</span></a>

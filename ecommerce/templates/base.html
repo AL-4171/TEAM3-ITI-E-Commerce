@@ -34,8 +34,8 @@
     </nav>
 
     <div class="nav-act">
-      {# cart teammate: replace href="#" with {% url 'cart:view' %} once ready #}
-      <a class="btn btn-ghost" href="#"><span>Cart</span></a>
+      {# cart teammate: replace href="#" with once ready #}
+      <a class="btn btn-ghost" href="{% url 'cart:cart_detail' %}"><span>Cart</span></a>
       {% if user.is_authenticated %}
         <a class="btn" href="{% url 'accounts:profile' %}">
           <span>{% if user.is_staff %}Admin, {{ user.first_name }}{% else %}{{ user.first_name|default:"Account" }}{% endif %}</span>

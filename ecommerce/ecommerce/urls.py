@@ -1,4 +1,5 @@
-"""ecommerce URL Configuration
+"""
+ecommerce URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
@@ -28,7 +29,7 @@ urlpatterns = [
     # uncomment each one as that app's
     # urls.py file is actually created by its owner.
      path('accounts/', include('accounts.urls')),
-    # path('cart/', include('cart.urls')),
+     path('cart/', include('cart.urls')),
     # path('orders/', include('orders.urls')),
 ]
  
