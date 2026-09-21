@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.id }} | Electro Store{% endblock %}
+{% block extra_css %}
+<style>
+    .orders-page {
+        padding: 64px 0 40px
+    }
+
+    .orders-page h1 {
+        font-family: var(--display);
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        margin: 0 0 8px
+    }
+
+    .order-date {
+        color: var(--muted);
+        margin: 0 0 30px
+    }
+
+    .order-box {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden
+    }
+
+    .order-table {
+        width: 100%;
+        border-collapse: collapse
+    }
+
+    .order-table th,
+    .order-table td {
+        text-align: left;
+        padding: 17px 20px;
+        border-bottom: 1px solid var(--line)
+    }
+
+    .order-table th {
+        color: var(--muted);
+        font-size: .8rem;
+        text-transform: uppercase;
+        letter-spacing: .06em
+    }
+
+    .order-table td:last-child,
+    .order-table th:last-child {
+        text-align: right
+    }
+
+    .order-total-row td {
+        border-bottom: 0;
+        font-weight: 700;
+        font-size: 1.05rem
+    }
+
+    .order-actions {
+        margin-top: 24px
+    }
+
+    @media(max-width:600px) {
+
+        .order-table th:nth-child(3),
+        .order-table td:nth-child(3) {
+            display: none
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 14px 10px
+        }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<section class="orders-page">
+    <div class="wrap">
+        <h1>Order #{{ order.id }}</h1>
+        <p class="order-date">Placed {{ order.created_at|date:"F j, Y, g:i a" }}</p>
+        <div class="order-box">
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price_at_purchase }}</td>
+                        <td>{{ item.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="order-total-row">
+                        <td colspan="3">Order Total</td>
+                        <td>{{ order.total }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="order-actions"><a class="btn btn-ghost" href="{% url 'orders:order_history' %}"><span>Back to My
+                    Orders</span></a></div>
+    </div>
+</section>
+{% endblock %}

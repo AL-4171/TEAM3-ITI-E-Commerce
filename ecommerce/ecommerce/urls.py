@@ -30,7 +30,7 @@ urlpatterns = [
     # urls.py file is actually created by its owner.
      path('accounts/', include('accounts.urls')),
      path('cart/', include('cart.urls')),
-    # path('orders/', include('orders.urls')),
+    path('orders/', include('orders.urls')),
 ]
  
 # Serve uploaded product images during development only.

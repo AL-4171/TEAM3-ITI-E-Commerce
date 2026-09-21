@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import CategoryForm, ProductForm , UserManageForm
 from .models import Category, Product
 from django.contrib.auth import get_user_model
+from orders.models import Order
 
 User = get_user_model()
 
@@ -299,6 +300,9 @@ def admin_dashboard(request):
     return render(
         request,
         "catalog/admin/admin_dashboard.html",
+        {
+            "order_count": Order.objects.count(),
+        },
     )
 
 # =========================================================
