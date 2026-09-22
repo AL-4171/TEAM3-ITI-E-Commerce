@@ -302,6 +302,9 @@ def admin_dashboard(request):
         "catalog/admin/admin_dashboard.html",
         {
             "order_count": Order.objects.count(),
+            "category_count": Category.objects.count(),
+            "product_count": Product.objects.count(),
+            "user_count": User.objects.count(),
         },
     )
 
