@@ -112,7 +112,7 @@
         <div class="count">{{ user_count }}</div>
         <p>View and manage customer accounts and staff permissions.</p>
         <div class="links">
-          <a class="btn btn-edit" href="/catalog/manage/users/"><span>Manage Users</span></a>
+          <a class="btn btn-edit" href="{% url 'catalog:admin_user_list' %}"><span>Manage Users</span></a>
         </div>
       </article>
     </div>
