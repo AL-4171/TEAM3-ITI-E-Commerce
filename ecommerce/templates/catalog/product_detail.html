@@ -137,35 +137,54 @@
         </dl>
       </div>
 
-      {% comment %}
-        Cart teammate wires this form to their add-to-cart view.
-        Orders teammate: "Buy Now" should skip the cart and go straight
-        to checkout with this one product/quantity pre-filled — wire the
-        href below to your checkout URL once it exists.
-        Authentication teammate: once accounts app is ready, wrap this
-        form (or the submit button) in {% if user.is_authenticated %}
-        if guests should not be able to add to cart / buy directly.
-      {% endcomment %}
+     
       <form class="buy" method="post" action="{% url 'cart:add_to_cart' product.id %}">
-          {% csrf_token %}
+        {% csrf_token %}
+    
         <div class="qty">
-          <label for="quantity">Quantity</label>
-          <input type="number" id="quantity" name="quantity" value="1"
-           min="1" max="{{ product.stock }}" {% if not product.in_stock %}disabled{% endif %}>
+            <label for="quantity">Quantity</label>
+            <input
+                type="number"
+                id="quantity"
+                name="quantity"
+                value="1"
+                min="1"
+                max="{{ product.stock }}"
+                {% if not product.in_stock %}disabled{% endif %}
+            >
         </div>
-
-             <!--  Zorar Add to Cart -->
-       <button type="submit" name="action" value="add_to_cart" class="btn" {% if not product.in_stock %}disabled{% endif %}>
-         <span>{% if product.in_stock %}Add to Cart{% else %}Unavailable{% endif %}</span>
-       </button>
-
-                <!-- 2. Zorar Buy Now (bi-ye'mel POST le-checkout) -->
-       <button type="submit" formmethod="post" formaction="{% url 'cart:add_to_cart' product.id %}?next=checkout" class="btn btn-accent" {% if not product.in_stock %}disabled{% endif %}>
-         <span>{% if product.in_stock %}Buy Now{% else %}Unavailable{% endif %}</span>
-       </button>
-
-        <a class="btn btn-ghost" href="{% url 'catalog:product_list' %}"><span>Keep browsing</span></a>
-      </form>
+    
+        <button
+            type="submit"
+            name="action"
+            value="add_to_cart"
+            class="btn"
+            {% if not product.in_stock %}disabled{% endif %}
+        >
+            <span>
+                {% if product.in_stock %}Add to Cart{% else %}Unavailable{% endif %}
+            </span>
+        </button>
+    
+        <button
+            type="submit"
+            name="action"
+            value="buy_now"
+            class="btn btn-accent"
+            {% if not product.in_stock %}disabled{% endif %}
+        >
+            <span>
+                {% if product.in_stock %}Buy Now{% else %}Unavailable{% endif %}
+            </span>
+        </button>
+    
+        <a
+            class="btn btn-ghost"
+            href="{% url 'catalog:product_list' %}"
+        >
+            <span>Keep browsing</span>
+        </a>
+    </form>
     </div>
   </div>
 

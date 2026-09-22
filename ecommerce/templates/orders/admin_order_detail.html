@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.id }} | Electro Store{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .order-detail-page {
+        padding: 64px 0 40px;
+    }
+
+    .order-detail-page h1 {
+        font-family: var(--display);
+        font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+        margin: 0 0 8px;
+    }
+
+    .order-meta {
+        color: var(--muted);
+        margin: 0 0 32px;
+    }
+
+    .order-grid {
+        display: grid;
+        grid-template-columns: 1.4fr .8fr;
+        gap: 28px;
+    }
+
+    .order-panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+    }
+
+    .order-panel h2 {
+        font-family: var(--display);
+        font-size: 1.1rem;
+        margin: 0 0 16px;
+    }
+
+    .order-items {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .order-items th,
+    .order-items td {
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--line);
+        font-size: .9rem;
+        vertical-align: middle;
+    }
+
+    .order-items th {
+        color: var(--muted);
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .order-items th:first-child,
+    .order-items td:first-child {
+        width: 45%;
+        text-align: left;
+    }
+
+    .order-items th:nth-child(2),
+    .order-items td:nth-child(2) {
+        width: 15%;
+        text-align: center;
+    }
+
+    .order-items th:nth-child(3),
+    .order-items td:nth-child(3) {
+        width: 20%;
+        text-align: right;
+    }
+
+    .order-items th:nth-child(4),
+    .order-items td:nth-child(4) {
+        width: 20%;
+        text-align: right;
+    }
+
+    .status-form select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-bottom: 14px;
+    }
+
+    .ship-line {
+        margin: 0 0 8px;
+        font-size: .92rem;
+    }
+
+    .ship-line strong {
+        color: var(--muted);
+        font-weight: 600;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="order-detail-page">
+    <div class="wrap">
+
+    <h1>Order #{{ order.id }}</h1>
+
+    <p class="order-meta">
+        Placed by {{ order.user.email }}
+        on {{ order.created_at|date:"F j, Y, g:i a" }}
+    </p>
+
+    <div class="order-grid">
+
+        <div class="order-panel">
+
+            <h2>Items</h2>
+
+            <table class="order-items">
+
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price_at_purchase }} EGP</td>
+                        <td>{{ item.subtotal }} EGP</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+            <p style="text-align:right;margin-top:16px;font-weight:700">
+                Total: {{ order.total }} EGP
+            </p>
+
+        </div>
+
+        <div>
+
+            <div class="order-panel" style="margin-bottom:20px">
+
+                <h2>Update Status</h2>
+
+                <form class="status-form" method="post">
+
+                    {% csrf_token %}
+
+                    <select name="status">
+                        {% for value, label in order.STATUS_CHOICES %}
+                            <option value="{{ value }}"
+                                {% if order.status == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <button class="btn" type="submit" style="width:100%">
+                        <span>Save Status</span>
+                    </button>
+
+                </form>
+
+            </div>
+
+            <div class="order-panel">
+
+                <h2>Shipping Info</h2>
+
+                <p class="ship-line">
+                    <strong>Name:</strong> {{ order.shipping_full_name }}
+                </p>
+
+                <p class="ship-line">
+                    <strong>Phone:</strong> {{ order.shipping_phone }}
+                </p>
+
+                <p class="ship-line">
+                    <strong>Address:</strong> {{ order.shipping_address }}
+                </p>
+
+                <p class="ship-line">
+                    <strong>City:</strong> {{ order.shipping_city }}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+{% endblock %}

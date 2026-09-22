@@ -13,6 +13,15 @@
     margin: 0 auto;
   }
 
+  .cart-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    margin-bottom: 18px;
+  }
+
   .cart-title {
     font-family: var(--display);
     font-size: clamp(2rem, 4vw, 3rem);
@@ -204,6 +213,10 @@
   <div class="wrap">
 
     <div class="cart-shell">
+
+      <a href="javascript:history.back()" class="btn btn-ghost cart-back">
+        <span>← Back</span>
+      </a>
 
       <h1 class="cart-title">🛒 Shopping Cart</h1>
 

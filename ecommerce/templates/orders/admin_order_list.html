@@ -42,6 +42,13 @@
     .order-table tr:last-child td {
         border-bottom: 0
     }
+
+    .status-pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+    .status-pending{background:#FEF6E4;color:#946200}
+    .status-confirmed{background:#EFEBFE;color:#3B24B8}
+    .status-shipped{background:#E4F1FE;color:#0B5FA5}
+    .status-delivered{background:#E7F8F1;color:#0E8A5F}
+    .status-cancelled{background:#FFF1EF;color:#C4372B}
 </style>
 {% endblock %}
 {% block content %}
@@ -57,6 +64,7 @@
                         <th>Date</th>
                         <th>Total</th>
                         <th>Status</th>
+                        <th style="text-align:right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,10 +72,13 @@
                         <td>#{{ order.id }}</td>
                         <td>{{ order.user.email }}</td>
                         <td>{{ order.created_at|date:"F j, Y, g:i a" }}</td>
-                        <td>{{ order.total }}</td>
-                        <td>{{ order.get_status_display }}</td>
+                        <td>{{ order.total }} EGP</td>
+                        <td><span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                        <td style="text-align:right">
+                            <a class="btn btn-edit" href="{% url 'orders:admin_order_detail' order.id %}"><span>View / Update</span></a>
+                        </td>
                     </tr>{% empty %}<tr>
-                        <td colspan="5">No orders yet.</td>
+                        <td colspan="6">No orders yet.</td>
                     </tr>{% endfor %}
                 </tbody>
             </table>

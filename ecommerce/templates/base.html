@@ -74,16 +74,10 @@
     <button class="admin-close" id="adminClose">✕</button>
     <h3>Admin Panel</h3>
     <p class="sub">Manage the store's data directly.</p>
+    <a href="{% url 'catalog:admin_user_list' %}">Manage Users</a>
     <a href="{% url 'catalog:admin_category_list' %}">Manage Categories</a>
-    <a href="{% url 'catalog:admin_category_add' %}">+ Add Category</a>
     <a href="{% url 'catalog:admin_product_list' %}">Manage Products</a>
-    <a href="{% url 'catalog:admin_product_add' %}">+ Add Product</a>
     <a href="{% url 'orders:admin_order_list' %}">Manage Orders</a>
-    {% if user.is_authenticated and user.is_staff %}
-    <a href="{% url 'catalog:admin_dashboard' %}">
-      Full Manage →
-    </a>
-    {% endif %}
   </aside>
   {% endif %}
 

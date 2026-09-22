@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Manage Users | Atelier Souq{% endblock %}
+{% block title %}Manage Users | Electro Store{% endblock %}
 
 {% block extra_css %}
+
 <style>
 
   .admin-page{
@@ -31,7 +32,6 @@
   .admin-heading-actions{
     display:flex;
     gap:10px;
-    flex-wrap:wrap;
   }
 
   /* TABLE */
@@ -41,19 +41,18 @@
     background:var(--surface);
     border:1px solid var(--line);
     border-radius:18px;
-    box-shadow:0 14px 35px -25px rgba(22,17,41,.35);
   }
 
   .admin-table table{
     width:100%;
-    min-width:1050px;
-    border-collapse:separate;
-    border-spacing:0;
+    min-width:950px;
+    border-collapse:collapse;
+    table-layout:fixed;
   }
 
   .admin-table th,
   .admin-table td{
-    padding:20px 22px;
+    padding:16px 18px;
     text-align:left;
     vertical-align:middle;
     border-bottom:1px solid var(--line);
@@ -69,24 +68,54 @@
     white-space:nowrap;
   }
 
-  .admin-table th:first-child{
-    border-radius:18px 0 0 0;
-  }
-
-  .admin-table th:last-child{
-    border-radius:0 18px 0 0;
-  }
-
-  .admin-table tbody tr{
-    transition:background .2s ease;
+  .admin-table tbody tr:last-child td{
+    border-bottom:0;
   }
 
   .admin-table tbody tr:hover{
     background:#faf9fd;
   }
 
-  .admin-table tbody tr:last-child td{
-    border-bottom:0;
+  /* COLUMN WIDTHS */
+
+  .admin-table th:nth-child(1),
+  .admin-table td:nth-child(1){
+    width:7%;
+  }
+
+  .admin-table th:nth-child(2),
+  .admin-table td:nth-child(2){
+    width:22%;
+  }
+
+  .admin-table th:nth-child(3),
+  .admin-table td:nth-child(3){
+    width:20%;
+  }
+
+  .admin-table th:nth-child(4),
+  .admin-table td:nth-child(4){
+    width:13%;
+  }
+
+  .admin-table th:nth-child(5),
+  .admin-table td:nth-child(5){
+    width:12%;
+  }
+
+  .admin-table th:nth-child(6),
+  .admin-table td:nth-child(6){
+    width:10%;
+  }
+
+  .admin-table th:nth-child(7),
+  .admin-table td:nth-child(7){
+    width:10%;
+  }
+
+  .admin-table th:nth-child(8),
+  .admin-table td:nth-child(8){
+    width:16%;
   }
 
   /* USER */
@@ -94,13 +123,13 @@
   .user-info{
     display:flex;
     align-items:center;
-    gap:13px;
-    min-width:190px;
+    gap:10px;
+    min-width:0;
   }
 
   .user-avatar{
-    width:42px;
-    height:42px;
+    width:38px;
+    height:38px;
     border-radius:50%;
     display:flex;
     align-items:center;
@@ -109,7 +138,6 @@
     background:#efebfe;
     color:var(--primary-deep);
     font-weight:800;
-    font-size:.9rem;
   }
 
   .user-name{
@@ -120,17 +148,18 @@
 
   .user-sub{
     color:var(--muted);
-    font-size:.78rem;
-    margin-top:4px;
+    font-size:.75rem;
+    margin-top:3px;
   }
 
-  .user-email{
-    font-size:.9rem;
+  .user-email,
+  .user-mobile{
+    font-size:.88rem;
+    overflow-wrap:anywhere;
   }
 
   .user-mobile{
     color:var(--muted);
-    font-size:.9rem;
   }
 
   /* STATUS */
@@ -138,15 +167,15 @@
   .status-group{
     display:flex;
     flex-wrap:wrap;
-    gap:6px;
+    gap:5px;
   }
 
   .status-pill{
     display:inline-flex;
     align-items:center;
-    padding:5px 11px;
+    padding:5px 9px;
     border-radius:999px;
-    font-size:.7rem;
+    font-size:.68rem;
     font-weight:800;
     white-space:nowrap;
   }
@@ -175,17 +204,14 @@
 
   .action-group{
     display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:8px;
+    justify-content:center;
+    gap:6px;
   }
 
   .action-group .btn{
-    padding:9px 13px;
-    font-size:.82rem;
+    padding:8px 11px;
+    font-size:.78rem;
   }
-
-  
 
   /* EMPTY */
 
@@ -237,8 +263,8 @@
   }
 
 </style>
-{% endblock %}
 
+{% endblock %}
 
 {% block content %}
 
@@ -246,226 +272,208 @@
 
   <div class="wrap">
 
-    <div class="admin-heading">
 
-      <div>
-        <h1>Manage Users</h1>
+<div class="admin-heading">
 
-        <p>
-          View and manage customer and staff accounts.
-        </p>
-      </div>
+  <div>
+    <h1>Manage Users</h1>
 
-      <div class="admin-heading-actions">
+    <p>
+      View and manage customer and staff accounts.
+    </p>
+  </div>
 
-        <a
-          class="btn btn-accent"
-          href="{% url 'catalog:admin_user_add' %}"
-        >
-          <span>+ Add User</span>
-        </a>
-
-      </div>
-
-    </div>
-
-
-    {% if users %}
-
-      <div class="admin-table">
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th>ID</th>
-              <th>User</th>
-              <th>Email</th>
-              <th>Mobile</th>
-              <th>Account</th>
-              <th>Joined</th>
-              <th>Last Login</th>
-              <th class="user-actions">Actions</th>
-            </tr>
-
-          </thead>
-
-
-          <tbody>
-
-            {% for managed_user in users %}
-
-              <tr>
-
-                <td>
-                  #{{ managed_user.pk }}
-                </td>
-
-
-                <td>
-
-                  <div class="user-info">
-
-                    <div class="user-avatar">
-                      {{ managed_user.email|first|upper }}
-                    </div>
-
-                    <div>
-
-                      <div class="user-name">
-                        {{ managed_user.get_full_name|default:"Unnamed user" }}
-                      </div>
-
-                      <div class="user-sub">
-
-                        {% if managed_user.is_superuser %}
-                          Superuser
-                        {% elif managed_user.is_staff %}
-                          Staff
-                        {% else %}
-                          Customer
-                        {% endif %}
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </td>
-
-
-                <td>
-                  <div class="user-email">
-                    {{ managed_user.email }}
-                  </div>
-                </td>
-
-
-                <td>
-
-                  <div class="user-mobile">
-                    {{ managed_user.mobile|default:"—" }}
-                  </div>
-
-                </td>
-
-
-                <td>
-
-                  <div class="status-group">
-
-                    {% if managed_user.is_active %}
-
-                      <span class="status-pill status-active">
-                        Active
-                      </span>
-
-                    {% else %}
-
-                      <span class="status-pill status-inactive">
-                        Inactive
-                      </span>
-
-                    {% endif %}
-
-
-                    {% if managed_user.is_staff %}
-
-                      <span class="status-pill status-staff">
-                        Staff
-                      </span>
-
-                    {% endif %}
-
-                  </div>
-
-                </td>
-
-
-                <td>
-                  {{ managed_user.date_joined|date:"M d, Y" }}
-                </td>
-
-
-                <td>
-
-                  {% if managed_user.last_login %}
-                    {{ managed_user.last_login|date:"M d, Y H:i" }}
-                  {% else %}
-                    Never
-                  {% endif %}
-
-                </td>
-
-
-                <td class="user-actions">
-
-                  <div class="action-group">
-
-                    <a
-                      class="btn btn-edit"
-                      href="{% url 'catalog:admin_user_edit' managed_user.pk %}"
-                    >
-                      <span>Edit</span>
-                    </a>
-
-
-                    {% if managed_user != request.user %}
-
-                      <a
-                        class="btn btn-delete"
-                        href="{% url 'catalog:admin_user_delete' managed_user.pk %}"
-                      >
-                        <span>Delete</span>
-                      </a>
-
-                    {% endif %}
-
-                  </div>
-
-                </td>
-
-              </tr>
-
-            {% endfor %}
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    {% else %}
-
-      <div class="empty">
-
-        <h3>No users yet</h3>
-
-        <p>
-          Registered accounts will appear here.
-        </p>
-
-        <a
-          class="btn btn-accent"
-          href="{% url 'catalog:admin_user_add' %}"
-          style="margin-top:20px;"
-        >
-          <span>+ Add First User</span>
-        </a>
-
-      </div>
-
-    {% endif %}
-
+  <div class="admin-heading-actions">
 
     <a
-      class="back-link"
-      href="{% url 'catalog:admin_dashboard' %}"
+      class="btn btn-accent"
+      href="{% url 'catalog:admin_user_add' %}"
     >
-      ← Back to Dashboard
+      <span>+ Add User</span>
     </a>
+
+  </div>
+
+</div>
+
+
+{% if users %}
+
+  <div class="admin-table">
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User</th>
+          <th>Email</th>
+          <th>Mobile</th>
+          <th>Account</th>
+          <th>Joined</th>
+          <th>Last Login</th>
+          <th class="user-actions">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        {% for managed_user in users %}
+
+          <tr>
+
+            <td>
+              #{{ managed_user.pk }}
+            </td>
+
+            <td>
+
+              <div class="user-info">
+
+                <div class="user-avatar">
+                  {{ managed_user.email|first|upper }}
+                </div>
+
+                <div>
+
+                  <div class="user-name">
+                    {{ managed_user.get_full_name|default:"Unnamed user" }}
+                  </div>
+
+                  <div class="user-sub">
+
+                    {% if managed_user.is_superuser %}
+                      Superuser
+                    {% elif managed_user.is_staff %}
+                      Staff
+                    {% else %}
+                      Customer
+                    {% endif %}
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </td>
+
+            <td>
+              <div class="user-email">
+                {{ managed_user.email }}
+              </div>
+            </td>
+
+            <td>
+              <div class="user-mobile">
+                {{ managed_user.mobile|default:"—" }}
+              </div>
+            </td>
+
+            <td>
+
+              <div class="status-group">
+
+                {% if managed_user.is_active %}
+                  <span class="status-pill status-active">
+                    Active
+                  </span>
+                {% else %}
+                  <span class="status-pill status-inactive">
+                    Inactive
+                  </span>
+                {% endif %}
+
+                {% if managed_user.is_staff %}
+                  <span class="status-pill status-staff">
+                    Staff
+                  </span>
+                {% endif %}
+
+              </div>
+
+            </td>
+
+            <td>
+              {{ managed_user.date_joined|date:"M d, Y" }}
+            </td>
+
+            <td>
+
+              {% if managed_user.last_login %}
+                {{ managed_user.last_login|date:"M d, Y H:i" }}
+              {% else %}
+                Never
+              {% endif %}
+
+            </td>
+
+            <td class="user-actions">
+
+              <div class="action-group">
+
+                <a
+                  class="btn btn-edit"
+                  href="{% url 'catalog:admin_user_edit' managed_user.pk %}"
+                >
+                  <span>Edit</span>
+                </a>
+
+                {% if managed_user != request.user %}
+
+                  <a
+                    class="btn btn-delete"
+                    href="{% url 'catalog:admin_user_delete' managed_user.pk %}"
+                  >
+                    <span>Delete</span>
+                  </a>
+
+                {% endif %}
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        {% endfor %}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+{% else %}
+
+  <div class="empty">
+
+    <h3>No users yet</h3>
+
+    <p>
+      Registered accounts will appear here.
+    </p>
+
+    <a
+      class="btn btn-accent"
+      href="{% url 'catalog:admin_user_add' %}"
+      style="margin-top:20px;"
+    >
+      <span>+ Add First User</span>
+    </a>
+
+  </div>
+
+{% endif %}
+
+
+<a
+  class="back-link"
+  href="{% url 'catalog:admin_dashboard' %}"
+>
+  ← Back to Dashboard
+</a>
+
 
   </div>
 
